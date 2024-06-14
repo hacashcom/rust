@@ -1,10 +1,24 @@
 
-/*
-
-  u8 MAX: 255
- u32 MAX: 42_94967295
-u128 MAX: 3402823_66920938_46346337_46074317_68211455
-1234567890123456
-*/
 
 
+#[derive(Debug)]
+pub struct Stack {
+    datas: Vec<StackItem>,
+    limit: usize, // max len
+}
+
+
+impl Stack {
+
+    pub fn new(lmt: usize) -> Stack {
+        Stack {
+            datas: vec![],
+            limit: lmt,
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.datas.len()
+    }
+        
+}

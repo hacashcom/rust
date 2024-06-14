@@ -20,6 +20,7 @@ mod core;
 #[macro_use]
 mod protocol;
 mod mint;
+#[macro_use]
 mod vm;
 mod chain;
 mod node;
@@ -61,7 +62,7 @@ fn main() {
     // main_test8327459283();
     // main_test_vecspeed387425983();
 
-    // main_test736428456983476824();
+    return main_vm_execute_89234765982374();
 
 
 

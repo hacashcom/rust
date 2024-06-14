@@ -23,3 +23,4 @@ use crate::chain::engine::*;
 
 include!("test.rs");
 include!("engine.rs");
+include!("vm.rs");

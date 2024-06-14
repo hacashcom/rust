@@ -34,6 +34,7 @@ mod core;
 #[macro_use]
 mod protocol;
 mod mint;
+#[macro_use]
 mod vm;
 mod chain;
 mod node;
