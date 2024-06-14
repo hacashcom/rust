@@ -8,10 +8,11 @@ where
     F: FnOnce(&StackItem, &StackItem) -> VmrtRes<StackItem>
 {
     let mut x = operand_stack.pop()?;
-    let mut y = operand_stack.pop()?;
+    let mut y = operand_stack.peek()?;
     cast_arithmetic(&mut x, &mut y)?;
     let v = f(&x, &y)?;
-    operand_stack.push(v)
+    *y = v;
+    Ok(())
 }
 
 

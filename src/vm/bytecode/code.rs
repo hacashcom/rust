@@ -15,6 +15,17 @@ pub enum Bytecode {
     PUSHU8 = 0x48,
     PUSHU16 = 0x49,
 
+    DUP   = 0x58,
+    POP   = 0x59,
+
+    CASTU8 =   0x40,
+    CASTU16 =  0x41,
+    CASTU32 =  0x42,
+    CASTU64 =  0x43,
+    CASTU128 = 0x44,
+    // CASTU256 = 0x45,
+    CASTBUF =  0x46,
+
     ADD   = 0x80, // +
 }
 

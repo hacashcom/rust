@@ -1,4 +1,5 @@
 
+
 use crate::vm;
 use crate::vm::*;
 use crate::vm::value::*;
@@ -20,19 +21,31 @@ pub fn main_test98237456289375() {
 
 pub fn main_vm_execute_89234765982374() {
 
-    let codes = hex::decode("4A4B80480980").unwrap();
+    let mut codes = hex::decode("4A58414B804809805959").unwrap();
+    codes = codes.repeat(600);
     let gas_table = vec![1].repeat(256);
 
-    let mut gas_usable = 10000i64;
+    let gas_limit = 10000000000000i64;
+    let mut gas_usable = gas_limit;
     let mut operand_stack = stack::Stack::new(256);
     let mut locals = stack::Stack::new(256);
 
-    let res = vm::interpreter::execute_code(&codes, &gas_table, 
+    let now = Instant::now();
+    
+    let mut lpnm: isize = 20;
+    let mut res;
+    loop {
+        res = vm::interpreter::execute_code(&codes, &gas_table, 
         &mut gas_usable, &mut operand_stack, &mut locals );
+        lpnm -= 1;
+        if lpnm <= 0 { break }
+    }
+
+    println!("benchmark run time = {:?}", Instant::now().duration_since(now));
 
     println!("vm execute_code res = {:?}", res);
 
-    println!("operand_stack: {:?}", operand_stack);
+    println!("operand_stack: {:?}, gas use: {}", operand_stack, gas_limit - gas_usable);
 
 
 

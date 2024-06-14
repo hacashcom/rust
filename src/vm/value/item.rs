@@ -33,44 +33,8 @@ impl StackItem {
         }
     }
 
-    pub fn cast_bool(&mut self) -> RetErr {
-        let notz = match self {
-            // Nil     => false,
-            U8(n)   => *n != 0,
-            U16(n)  => *n != 0,
-            U32(n)  => *n != 0,
-            U64(n)  => *n != 0,
-            U128(n) => *n != 0,
-            Buffer(b)  => buf_is_not_zero(b),
-            s => return errf!("cannot cast {:?} to bool", s),
-        };
-        if notz {
-            *self = U8(1); // true
-        } else {
-            *self = U8(0); // false
-        }
-        Ok(())
-    }
 
 }
 
 
-
-
-
-/**
-* ret: change left(-1) nothing(0) or right(1), err is cannot do cast
-*/
-pub fn castv(l: &mut StackItem, r: &mut StackItem) -> Ret<i8> {
-    match (l, r) {
-        (U8(_),     U8(_))     => Ok(0),
-        (U16(_),    U16(_))    => Ok(0),
-        (U32(_),    U32(_))    => Ok(0),
-        (U64(_),    U64(_))    => Ok(0),
-        (U128(_),   U128(_))   => Ok(0),
-        (Buffer(_), Buffer(_)) => Ok(0),
-
-        (l, r) => errf!("cannot do cast between with type {:?} and {:?}", l, r),
-    }
-}
 

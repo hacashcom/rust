@@ -83,6 +83,16 @@ pub fn execute_code(
             PUSH1 => operand_stack.push(StackItem::U8(1))?,
             PUSHU8 => operand_stack.push(StackItem::U8( itrparamu8!(codes, pc, tail) ))?,
             PUSHU16 => operand_stack.push(StackItem::U16( itrparamu16!(codes, pc, tail) ))?,
+            DUP =>  operand_stack.push(operand_stack.last()?)?,
+            POP => { operand_stack.pop()?; }, // drop
+            // cast
+            CASTU8 => operand_stack.peek()?.cast_u8()?,
+            CASTU16 => operand_stack.peek()?.cast_u16()?,
+            CASTU32 => operand_stack.peek()?.cast_u32()?,
+            CASTU64 => operand_stack.peek()?.cast_u64()?,
+            CASTU128 => operand_stack.peek()?.cast_u128()?,
+            // CASTU256 => operand_stack.peek()?.cast_u256()?,
+            CASTBUF => operand_stack.peek()?.cast_buf()?,
             // arithmetic
             ADD => binop_arithmetic(operand_stack, add_checked)?, // checked add
             _ => return itr_err_code!(InstInvalid)

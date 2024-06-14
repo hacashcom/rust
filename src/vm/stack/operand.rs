@@ -5,6 +5,14 @@
 */
 impl Stack {
 
+    pub fn peek<'a>(&'a mut self) -> VmrtRes<&'a mut StackItem> {
+        let n = self.datas.len();
+        if n <= 0 {
+            return Err(ItrErr::new(StackError, "Read empty stack"))
+        }
+        Ok(unsafe { self.datas.get_unchecked_mut(n - 1) })
+    }
+
     pub fn pop(&mut self) -> VmrtRes<StackItem> {
         self.datas.pop()
         .ok_or_else(||ItrErr::new(StackError, "Pop empty stack"))
