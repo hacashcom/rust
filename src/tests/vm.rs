@@ -19,6 +19,21 @@ pub fn main_test98237456289375() {
 }
 
 
+
+pub fn main_vm_frame_Call_2834756283974() {
+
+    let mut codes = hex::decode("bf034b42be01bd0159").unwrap();
+
+    let mut frame = vm::frame::CallFrame::make_new(
+        &codes, StackItem::empty_buf());
+    // do call
+    let res = frame.exec().call();
+
+    println!("vm frame call res = {:?}", res);
+}
+
+
+
 pub fn main_vm_execute_89234765982374() {
 
     // let mut codes = hex::decode("4e03010101594A58414B804809805959f000").unwrap();
@@ -35,8 +50,9 @@ pub fn main_vm_execute_89234765982374() {
     let mut lpnm: isize = 1;
     let mut res;
     loop {
+        let mut pc: usize = 0;
         res = vm::interpreter::execute_code(&codes, &gas_table, 
-        &mut gas_usable, &mut operand_stack, &mut locals );
+            &mut gas_usable, &mut pc, &mut locals, &mut operand_stack);
         lpnm -= 1;
         if lpnm <= 0 { break }
     }

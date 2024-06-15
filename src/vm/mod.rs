@@ -10,13 +10,14 @@ use crate::interface::vm::*;
 #[macro_use]
 pub mod rt;
 
-mod bytecode;
 mod ast;
 mod space;
 
-pub mod stack;
-pub mod interpreter;
+pub mod bytecode;
 pub mod value;
+pub mod stack;
+pub mod frame;
+pub mod interpreter;
 pub mod action;
 
 

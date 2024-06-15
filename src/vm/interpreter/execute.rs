@@ -83,10 +83,38 @@ macro_rules! dojump {
     }
 }
 
+macro_rules! ostdojump {
+    ($codes: expr, $pc: expr, $tail: expr, $l: expr) => {
+        {
+            let tpc = match $l {
+                1 => itrparam!{$codes, $pc, $tail, 1, i8} as isize,
+                2 => itrparam!{$codes, $pc, $tail, 2, i16} as isize,
+                _ => return itr_err_code!(CodeOverRun),
+            };
+            let tpc = ($pc as isize + tpc);
+            if tpc < 0 {
+                return itr_err_code!(CodeOverRun)
+            }
+            checkcodetail!(tpc as usize, $tail);
+            $pc = tpc as usize; // jump to
+        }
+    }
+}
+
 macro_rules! dobr {
     ( $operand_stack: expr, $codes: expr, $pc: expr, $tail: expr, $l: expr) => {
         if $operand_stack.pop()?.is_not_zero() {
             dojump!($codes, $pc, $tail, $l);
+        }else{
+            $pc += $l;
+        }
+    }
+}
+
+macro_rules! ostdobr {
+    ( $operand_stack: expr, $codes: expr, $pc: expr, $tail: expr, $l: expr) => {
+        if $operand_stack.pop()?.is_not_zero() {
+            ostdojump!($codes, $pc, $tail, $l);
         }else{
             $pc += $l;
         }
@@ -104,9 +132,10 @@ pub fn execute_code(
     gas_table: &[u8], // len = 256
 
     gas_usable: &mut i64, // max gas can be use
+    pc: &mut usize, // pc
 
-    operand_stack: &mut Stack,
     locals: &mut Stack,
+    operand_stack: &mut Stack,
 
 ) -> VmrtRes<ItrExitCode> {
 
@@ -185,8 +214,10 @@ pub fn execute_code(
             // workflow control
             JMP =>  dojump!(codes, pc, tail, 1),
             JMPL => dojump!(codes, pc, tail, 2),
-            BR =>  dobr!(operand_stack, codes, pc, tail, 1),
-            BRL => dobr!(operand_stack, codes, pc, tail, 2),
+            BR =>   dobr!(operand_stack, codes, pc, tail, 1),
+            BRL =>  dobr!(operand_stack, codes, pc, tail, 2),
+            BRS =>  ostdobr!(operand_stack, codes, pc, tail, 1),
+            BRSL => ostdobr!(operand_stack, codes, pc, tail, 2),
             // inst invalid
             _ => return itr_err_code!(InstInvalid),
         }
