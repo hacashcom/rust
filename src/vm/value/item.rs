@@ -1,7 +1,7 @@
 
 #[derive(Debug, Clone)]
 pub enum StackItem {
-    // Nil,          // type_id = 0
+    Nil,             // type_id = 0
     U8(u8),          //           1
     U16(u16),        //           2
     U32(u32),        //           3
@@ -15,13 +15,16 @@ use StackItem::*;
 
 impl StackItem {
 
+    pub fn nil() -> StackItem {
+        Nil
+    }
     pub fn empty_buf() -> StackItem {
         Buffer(vec![])
     }
 
     pub fn val_size(&self) -> usize {
         match self {
-            // Nil => 0,
+            Nil => 0,
             U8(_) => 1,
             U16(_) => 2,
             U32(_) => 4,

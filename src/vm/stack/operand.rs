@@ -32,7 +32,7 @@ impl Stack {
         if tsz >= self.limit {
             return itr_err_code!(OutOfStack)
         }
-        self.datas.resize(tsz, StackItem::empty_buf());
+        self.datas.resize(tsz, StackItem::nil());
         Ok(())
     }
 

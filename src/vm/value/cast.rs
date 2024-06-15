@@ -33,6 +33,7 @@ impl StackItem {
 
     pub fn is_not_zero(&mut self) -> bool {
         match self {
+            Nil => false,
             U8(n)   => *n != 0,
             U16(n)  => *n != 0,
             U32(n)  => *n != 0,
@@ -47,6 +48,15 @@ impl StackItem {
             *self = U8(1); // true
         } else {
             *self = U8(0); // false
+        }
+        Ok(())
+    }
+
+    pub fn cast_bool_not(&mut self) -> VmrtErr {
+        if self.is_not_zero() {
+            *self = U8(0); // false
+        } else {
+            *self = U8(1); // true
         }
         Ok(())
     }
@@ -98,6 +108,7 @@ impl StackItem {
 
     pub fn cast_buf(&mut self) -> VmrtErr {
         match &self {
+            Nil => *self = Buffer(vec![]),
             U8(n) =>   *self = Buffer(n.to_be_bytes().into()),
             U16(n) =>  *self = Buffer(n.to_be_bytes().into()),
             U32(n) =>  *self = Buffer(n.to_be_bytes().into()),

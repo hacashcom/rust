@@ -21,18 +21,18 @@ pub fn main_test98237456289375() {
 
 pub fn main_vm_execute_89234765982374() {
 
-    let mut codes = hex::decode("4A58414B804809805959").unwrap();
-    codes = codes.repeat(600);
+    // let mut codes = hex::decode("4e03010101594A58414B804809805959f000").unwrap();
+    let mut codes = hex::decode("bf034b42be01bd0159f002").unwrap();
     let gas_table = vec![1].repeat(256);
 
-    let gas_limit = 10000000000000i64;
+    let gas_limit = 1576i64;
     let mut gas_usable = gas_limit;
     let mut operand_stack = stack::Stack::new(256);
     let mut locals = stack::Stack::new(256);
 
     let now = Instant::now();
     
-    let mut lpnm: isize = 20;
+    let mut lpnm: isize = 1;
     let mut res;
     loop {
         res = vm::interpreter::execute_code(&codes, &gas_table, 
@@ -45,7 +45,7 @@ pub fn main_vm_execute_89234765982374() {
 
     println!("vm execute_code res = {:?}", res);
 
-    println!("operand_stack: {:?}, gas use: {}", operand_stack, gas_limit - gas_usable);
+    println!("operand_stack: {:?}, locals: {:?} gas use: {}", operand_stack, locals, gas_limit - gas_usable);
 
 
 
