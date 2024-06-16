@@ -1,9 +1,10 @@
 
 #[derive(Debug)]
-pub enum ItrExitCode {
-    Overend, 
+pub enum CallExit {
+    Tailend,
     Finish,
     Return,
     Abort,
+    Call(Funcptr),
 }
 

@@ -24,13 +24,15 @@ macro_rules! cast_low_to_up {
 }
 
 
+#[inline(always)]
 fn cannot_cast_err(v: &StackItem, ty: &str) -> VmrtErr {
-    Err(ItrErr::new(CastFail, &format!("cannot cast {:?} to {}", v, ty)))
+    itr_err_fmt!(CastFail, "cannot cast {:?} to {}", v, ty)
 }
 
 
 impl StackItem {
 
+    #[inline(always)]
     pub fn is_not_zero(&mut self) -> bool {
         match self {
             Nil => false,
@@ -43,6 +45,7 @@ impl StackItem {
         }
     }
 
+    #[inline(always)]
     pub fn cast_bool(&mut self) -> VmrtErr {
         if self.is_not_zero() {
             *self = U8(1); // true

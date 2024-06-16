@@ -23,8 +23,8 @@ fn buf_to_uint(buf: &[u8]) -> VmrtRes<StackItem> {
             let v = u128::from_be_bytes(bts.try_into().unwrap());
             Ok(StackItem::U128(v))
         },
-        _ => Err(ItrErr::new(CastFail, 
-            &format!("cannot cast 0x{} to uint", hex::encode(buf)))),
+        _ => itr_err_fmt!(CastFail, "cannot cast 0x{} to uint", 
+            hex::encode(buf)),
     }
 }
 

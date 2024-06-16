@@ -30,6 +30,8 @@ pub enum ItrErrCode {
     CastFail = 36,
     
     Arithmetic = 41,
+
+    ThrowAbort = 101, // user code call
 }
 
 #[derive(Debug)]
@@ -60,5 +62,12 @@ macro_rules! itr_err {
 macro_rules! itr_err_code {
     ($code: expr) => {
         Err(ItrErr($code, "".to_string()))
+    }
+}
+
+#[macro_export] 
+macro_rules! itr_err_fmt {
+    ($code: expr, $( $v: expr),+ ) => {
+        Err(ItrErr::new($code, &format!($( $v ),+)))
     }
 }

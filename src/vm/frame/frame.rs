@@ -4,6 +4,7 @@
 *
 */
 pub struct CallFrame<'a> {
+    pub deep: usize, // max 16
     pub pc: usize,
     pub codes: &'a [u8],
     pub local: Stack,
@@ -21,6 +22,19 @@ pub struct CallFrameExec<'a> {
 
 impl CallFrame<'_> {
 
+
+    pub fn new<'a>(codes: &'a [u8], input: StackItem) -> CallFrame<'a> {
+        let mut locals = Stack::new(256);
+        locals.push(input).unwrap(); // function args
+        CallFrame {
+            deep: 0, // max 16
+            pc:  0,
+            codes: codes,
+            local: locals,
+            stack: Stack::new(256),
+        }
+    }
+
     pub fn exec<'a>(&'a mut self) -> CallFrameExec<'a> {
         CallFrameExec {
             pc: &mut self.pc,
@@ -30,17 +44,8 @@ impl CallFrame<'_> {
         } 
     }
 
-    pub fn make_new<'a>(codes: &'a [u8], input: StackItem) -> CallFrame<'a> {
-        let mut locals = Stack::new(256);
-        locals.push(input).unwrap(); // function args
-        CallFrame {
-            pc:  0,
-            codes: codes,
-            local: locals,
-            stack: Stack::new(256),
-        }
-    }
 
+    
 }
 
 

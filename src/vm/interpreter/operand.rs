@@ -3,6 +3,7 @@
 /**
 *   such as: v = x + y
 */
+#[inline(always)]
 fn binop_arithmetic<F>(operand_stack: &mut Stack, f: F) -> VmrtErr
 where
     F: FnOnce(&StackItem, &StackItem) -> VmrtRes<StackItem>
@@ -20,6 +21,7 @@ where
 *   binop_between
 *   such as: v = x && y
 */
+#[inline(always)]
 fn binop_btw<F>(operand_stack: &mut Stack, f: F) -> VmrtErr
 where
     F: FnOnce(&StackItem, &StackItem) -> VmrtRes<StackItem>

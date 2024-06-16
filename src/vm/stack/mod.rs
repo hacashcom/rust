@@ -1,5 +1,5 @@
 
-
+use std::collections::{ HashMap };
 
 
 use crate::sys::*;
@@ -12,4 +12,5 @@ use super::value::*;
 
 include!("stack.rs");
 include!("operand.rs");
+include!("kvmap.rs");
 

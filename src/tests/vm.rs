@@ -22,12 +22,15 @@ pub fn main_test98237456289375() {
 
 pub fn main_vm_frame_Call_2834756283974() {
 
-    let mut codes = hex::decode("bf034b42be01bd0159").unwrap();
+    // let mut codes = hex::decode("bf034b42be01bd0159").unwrap();
+    let mut codes = hex::decode("4e03010101594A58414B804809805959f000").unwrap();
 
-    let mut frame = vm::frame::CallFrame::make_new(
-        &codes, StackItem::empty_buf());
+    let iptv = StackItem::empty_buf();
+    let mut frame = vm::frame::CallFrame::new(&codes, iptv);
     // do call
+    let now = Instant::now();
     let res = frame.exec().call();
+    println!("benchmark run time = {:?}", Instant::now().duration_since(now));
 
     println!("vm frame call res = {:?}", res);
 }

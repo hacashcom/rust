@@ -101,7 +101,7 @@ pub enum Bytecode {
     ________________91=0x5b,
     ________________92=0x5c,
     ________________93=0x5d,
-    ________________94=0x5e,
+    SWAP  = 0x5e, // swap a,b = b,a
     ________________95=0x5f,
     ________________96=0x60,
     ________________97=0x61,
@@ -242,7 +242,7 @@ pub enum Bytecode {
     ________________232=0xe8,
     ________________233=0xe9,
     ________________234=0xea,
-    ________________235=0xeb,
+    BURN  = 0xeb, // just burn gas
     NOP   = 0xec, // do nothing
     RET   = 0xed, // ret with data (function return)
     ABT   = 0xee, // end with error (abort)

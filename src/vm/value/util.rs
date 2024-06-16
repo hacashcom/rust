@@ -2,6 +2,7 @@
 use std::*;
 use num_traits::FromBytes;
 
+#[inline(always)]
 fn buf_is_not_zero(buf: &[u8]) -> bool {
     if buf.len() == 0 {
         return false // empty is zero
@@ -14,6 +15,7 @@ fn buf_is_not_zero(buf: &[u8]) -> bool {
     false
 }
 
+#[inline(always)]
 fn buf_drop_left_zero(buf: &[u8]) -> Vec<u8> {
     let n = buf.len();
     if n == 0 {
@@ -30,6 +32,7 @@ fn buf_drop_left_zero(buf: &[u8]) -> Vec<u8> {
     buf[l..].into()
 }
 
+#[inline(always)]
 fn buf_fill_left_zero(buf: &[u8], zn: usize) -> Vec<u8> {
     let res = buf[..].into();
     let sz = buf.len();

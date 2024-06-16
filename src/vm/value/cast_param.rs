@@ -2,8 +2,9 @@
 /**
 * 
 */
-pub fn cast_arithmetic(x: &mut StackItem, y: &mut StackItem) -> VmrtErr {
 
+#[inline(always)]
+pub fn cast_arithmetic(x: &mut StackItem, y: &mut StackItem) -> VmrtErr {
 
     match (&x, &y) {
         (U8(_),   U8(_)) |
@@ -51,8 +52,8 @@ pub fn cast_arithmetic(x: &mut StackItem, y: &mut StackItem) -> VmrtErr {
             return cast_arithmetic(x, y)
         },
 
-        (l, r) => return Err(ItrErr::new(CastFail, 
-            &format!("cannot do arithmetic cast between type {:?} and {:?}", l, r))),
+        (l, r) => return itr_err_fmt!(CastFail, 
+            "cannot do arithmetic cast between type {:?} and {:?}", l, r),
     };
 
     Ok(())

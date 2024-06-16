@@ -6,7 +6,7 @@ use crate::interface::protocol::*;
 use crate::interface::vm::*;
 use crate::protocol::*;
 
-use super::bytecode::*;
+use super::rt::*;
 
 
 include!("asts/extwrap.rs");

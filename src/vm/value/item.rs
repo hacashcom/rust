@@ -36,6 +36,23 @@ impl StackItem {
         }
     }
 
+    pub fn print_string(&self) -> String {
+        match self {
+            Nil => "nil".to_string(),
+            U8(n) => n.to_string(),
+            U16(n) => n.to_string(),
+            U32(n) => n.to_string(),
+            U64(n) => n.to_string(),
+            U128(n) => n.to_string(),
+            // U256(n) => n.to_string(),
+            Buffer(b) => match String::from_utf8(b.clone()) {
+                Err(_) => hex::encode(&b),
+                Ok(d) => d
+            },
+            _ => "null".to_string(), 
+        }
+    }
+
 
 }
 

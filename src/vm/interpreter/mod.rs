@@ -3,7 +3,6 @@
 use crate::sys::*;
 
 use super::rt::*;
-use super::bytecode::*;
 use super::value::*;
 use super::stack::*;
 
