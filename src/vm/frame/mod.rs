@@ -11,4 +11,5 @@ use super::interpreter::*;
 
 include!("frame.rs");
 include!("call.rs");
+include!("stack.rs");
 

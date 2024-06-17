@@ -14,9 +14,8 @@ impl Stack {
         self.datas.resize(tsz, StackItem::nil());
         Ok(())
     }
-    
-    #[inline(always)]
-    pub fn peek<'a>(&'a mut self) -> VmrtRes<&'a mut StackItem> {
+
+        pub fn peek<'a>(&'a mut self) -> VmrtRes<&'a mut StackItem> {
         let n = self.datas.len();
         if n <= 0 {
             return itr_err_fmt!(StackError, "Read empty stack")
@@ -24,14 +23,12 @@ impl Stack {
         Ok(unsafe { self.datas.get_unchecked_mut(n - 1) })
     }
 
-    #[inline(always)]
-    pub fn pop(&mut self) -> VmrtRes<StackItem> {
+        pub fn pop(&mut self) -> VmrtRes<StackItem> {
         self.datas.pop()
         .ok_or_else(||ItrErr::new(StackError, "Pop empty stack"))
     }
 
-    #[inline(always)]
-    pub fn push(&mut self, it: StackItem) -> VmrtErr {
+        pub fn push(&mut self, it: StackItem) -> VmrtErr {
         if self.datas.len() >= self.limit {
             return itr_err_code!(OutOfStack)
         }
@@ -40,8 +37,7 @@ impl Stack {
     }
 
 
-    #[inline(always)]
-    pub fn save(&mut self, it: StackItem, idx: u16) -> VmrtErr {
+        pub fn save(&mut self, it: StackItem, idx: u16) -> VmrtErr {
         let idx = idx as usize;
         if idx >= self.datas.len() {
             return itr_err_fmt!(LocalError, "Save local overflow")
@@ -50,8 +46,7 @@ impl Stack {
         Ok(())
     }
 
-    #[inline(always)]
-    pub fn load(&self, idx: u16) -> VmrtRes<StackItem> {
+        pub fn load(&self, idx: u16) -> VmrtRes<StackItem> {
         let idx = idx as usize;
         if idx >= self.datas.len() {
             return itr_err_fmt!(LocalError, "Read local overflow")
@@ -59,13 +54,11 @@ impl Stack {
         Ok(self.datas[idx].clone())
     }
     
-    #[inline(always)]
-    pub fn last(&self) -> VmrtRes<StackItem> {
+        pub fn last(&self) -> VmrtRes<StackItem> {
         self.lastn(0)
     }
 
-    #[inline(always)]
-    pub fn lastn(&self, n: u16) -> VmrtRes<StackItem> {
+        pub fn lastn(&self, n: u16) -> VmrtRes<StackItem> {
         let n = n as usize;
         let l = self.datas.len();
         if n >= l {
@@ -74,8 +67,7 @@ impl Stack {
         Ok(self.datas[l-n-1].clone())
     }
 
-    #[inline(always)]
-    pub fn swap(&mut self) -> VmrtErr {
+        pub fn swap(&mut self) -> VmrtErr {
         let l = self.datas.len();
         if l < 2 {
             return itr_err_fmt!(StackError, "Read empty stack")

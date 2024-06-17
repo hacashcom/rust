@@ -4,34 +4,37 @@ use super::rt::CallExit::*;
 use super::rt::ItrErrCode::*;
 
 
-impl CallFrameExec<'_> {
+impl FrameExec<'_, '_> {
 
-    pub fn call_code(&mut self, codes: &[u8]) -> VmrtRes<StackItem> {
-
-        // test
-        let gas_limit = 15000000i64;
-        let mut gas_usable = gas_limit;
-        let gas_table = vec![1].repeat(256);
-
-        let result = execute_code(
-            &codes,
-            &gas_table,
-            &mut gas_usable,
+    pub fn call(&mut self) -> VmrtRes<CallExit> {
+        // println!("FrameExec call pc = {}", self.pc);
+        execute_code(
+            self.codes,
             self.pc,
+            self.mode,
+            self.gas_limit,
+            self.gas_table,
+            self.gas_extra,
             self.local,
             self.stack,
-        )?;
-        
-        match result {
-            Tailend | Finish => Ok(StackItem::Nil),
-            Return => Ok( self.stack.pop()? ),
-            Abort => itr_err_fmt!(ThrowAbort, "Abort: {}", self.stack.pop()?.print_string()),
-            Call(funcptr) => Ok( StackItem::U8(1) ),
-        }
-    
+        )
     }
 
-    pub fn call(&mut self) -> VmrtRes<StackItem> {
-        self.call_code(&self.codes)
+    pub fn call_code(&mut self, codes: &[u8], pc: &mut usize) -> VmrtRes<CallExit> {
+        execute_code(
+            codes,
+            pc,
+            self.mode,
+            self.gas_limit,
+            self.gas_table,
+            self.gas_extra,
+            self.local,
+            self.stack,
+        )
     }
+
+
+
 }
+
+

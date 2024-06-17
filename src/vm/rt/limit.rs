@@ -1,7 +1,7 @@
 
-
+#[derive(Debug, Clone)]
 pub struct SpaceLimit {
-    pub call_deep: usize, // 16
+    pub call_depth: usize, // 16
     pub call_contract: usize, // 20
 
     pub total_stack: usize, // 16*16 = 256
@@ -19,7 +19,7 @@ impl SpaceLimit {
     pub fn new() -> SpaceLimit {
 
         SpaceLimit {
-            call_deep:      16,
+            call_depth:     16,
             call_contract:  20,
             total_stack:    256,
             total_local:    256,

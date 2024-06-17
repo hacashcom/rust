@@ -3,31 +3,40 @@
 /**
 *
 */
-pub struct CallFrame<'a> {
-    pub deep: usize, // max 16
+#[derive(Debug)]
+pub struct Frame {
+    pub depth: usize, // max 16
+    pub codes: Vec<u8>,
     pub pc: usize,
-    pub codes: &'a [u8],
+    pub mode: CallMode,
     pub local: Stack,
     pub stack: Stack,
 } 
 
 
-pub struct CallFrameExec<'a> {
+pub struct FrameExec<'a, 'b> {
+    depth: &'a usize,
+    codes: &'a [u8],
     pub pc: &'a mut usize,
-    pub codes: &'a [u8],
-    pub local: &'a mut Stack,
-    pub stack: &'a mut Stack,
+    mode: &'a CallMode,
+    local: &'a mut Stack,
+    stack: &'a mut Stack,
+    // machine
+    pub gas_limit: &'b mut i64,
+    gas_table: &'b GasTable,
+    gas_extra: &'b GasExtra,
+
 } 
 
 
-impl CallFrame<'_> {
+impl Frame {
 
-
-    pub fn new<'a>(codes: &'a [u8], input: StackItem) -> CallFrame<'a> {
+    pub fn new(mode: CallMode, deep: usize, codes:Vec<u8>, input: StackItem) -> Frame {
         let mut locals = Stack::new(256);
         locals.push(input).unwrap(); // function args
-        CallFrame {
-            deep: 0, // max 16
+        Frame {
+            mode: mode,
+            depth: deep, // max 16
             pc:  0,
             codes: codes,
             local: locals,
@@ -35,12 +44,21 @@ impl CallFrame<'_> {
         }
     }
 
-    pub fn exec<'a>(&'a mut self) -> CallFrameExec<'a> {
-        CallFrameExec {
+    pub fn exec<'a, 'b>(&'a mut self, 
+        gas_limit: &'b mut i64,
+        gas_table: &'b GasTable,
+        gas_extra: &'b GasExtra,
+    ) -> FrameExec<'a, 'b> {
+        FrameExec {
+            mode: &self.mode,
             pc: &mut self.pc,
             codes: &self.codes,
+            depth: &self.depth,
             local: &mut self.local,
             stack: &mut self.stack,
+            gas_limit,
+            gas_table,
+            gas_extra,
         } 
     }
 

@@ -7,15 +7,16 @@ pub enum ItrErrCode {
     CodeTooLong = 1, // code length
     CodeOverRun = 2, // pc out of limit
     
-    InstInvalid    = 6, // 
-    InstNeverTouch = 7, // 
+    InstInvalid    = 5, // 
+    InstNeverTouch = 6, // 
     
-    OutOfGas    = 11,
-    OutOfStack  = 12,
-    OutOfLocal  = 13,
-    OutOfHeap   = 14,
-    OutOfMemory = 15,
-    OutOfGlobal = 16,
+    OutOfGas       = 11,
+    OutOfStack     = 12,
+    OutOfLocal     = 13,
+    OutOfHeap      = 14,
+    OutOfMemory    = 15,
+    OutOfGlobal    = 16,
+    OutOfCallDepth = 17,
     
     GasError    = 21,
     StackError  = 22,
@@ -26,6 +27,7 @@ pub enum ItrErrCode {
     
     CallNotExist = 31,
     CallInvalid  = 32,
+    CallExitInvalid  = 33,
     
     CastFail = 36,
     

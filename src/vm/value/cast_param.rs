@@ -3,7 +3,6 @@
 * 
 */
 
-#[inline(always)]
 pub fn cast_arithmetic(x: &mut StackItem, y: &mut StackItem) -> VmrtErr {
 
     match (&x, &y) {
