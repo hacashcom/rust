@@ -50,7 +50,10 @@ impl Machine {
             };
 
             // test code
-            let load_codes = hex::decode("4b4458be002301f5f5f5f5").unwrap();
+            let mut load_codes = hex::decode("4b4458be002301f5f5f5f5").unwrap();
+            if self.call_stacks.len() >= 5 {
+                load_codes = hex::decode("4aee").unwrap(); // abort
+            }
 
 
             // mode: code

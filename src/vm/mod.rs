@@ -11,6 +11,7 @@ use crate::interface::vm::*;
 
 #[macro_use]
 pub mod rt;
+pub mod ir;
 pub mod value;
 pub mod stack;
 pub mod frame;

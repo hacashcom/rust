@@ -5,7 +5,7 @@
 
 
 #[repr(u8)]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Bytecode {
     ________________0=0x00,
     ________________1=0x01,
@@ -39,11 +39,11 @@ pub enum Bytecode {
     ________________29=0x1d,
     ________________30=0x1e,
     ________________31=0x1f,
-    CALL          = 0x20,
-    CALLLOC       = 0x21,
-    CALLLIB       = 0x22,
-    CALLSTATIC    = 0x23,
-    CALLCODE      = 0x24, // call mode: code
+    CALL              =0x20,
+    CALLLOC           =0x21,
+    CALLLIB           =0x22,
+    CALLSTATIC        =0x23,
+    CALLCODE          =0x24, // call mode: code
     ________________37=0x25,
     ________________38=0x26,
     ________________39=0x27,
@@ -71,21 +71,21 @@ pub enum Bytecode {
     ________________61=0x3d,
     ________________62=0x3e,
     ________________63=0x3f,
-    CASTU8 =   0x40,
-    CASTU16 =  0x41,
-    CASTU32 =  0x42,
-    CASTU64 =  0x43,
-    CASTU128 = 0x44,
+    CASTU8            =0x40,
+    CASTU16           =0x41,
+    CASTU32           =0x42,
+    CASTU64           =0x43,
+    CASTU128          =0x44,
     ________________69=0x45, /* CASTU256 = 0x45, */
-    CASTBUF =  0x46,
+    CASTBUF           =0x46,
     ________________71=0x47,
-    PUSHU8 = 0x48,
-    PUSHU16 = 0x49,
-    PUSH0 = 0x4a,
-    PUSH1 = 0x4b,
+    PUSHU8            =0x48,
+    PUSHU16           =0x49,
+    PUSH0             =0x4a,
+    PUSH1             =0x4b,
     ________________76=0x4c,
-    PUSHBUFL = 0x4d,
-    PUSHBUF = 0x4e,
+    PUSHBUFL          =0x4d,
+    PUSHBUF           =0x4e,
     ________________79=0x4f,
     ________________80=0x50,
     ________________81=0x51,
@@ -95,13 +95,13 @@ pub enum Bytecode {
     ________________85=0x55,
     ________________86=0x56,
     ________________87=0x57,
-    DUP   = 0x58,
-    POP   = 0x59,
+    DUP               =0x58,
+    POP               =0x59,
     ________________90=0x5a,
     ________________91=0x5b,
     ________________92=0x5c,
     ________________93=0x5d,
-    SWAP  = 0x5e, // swap a,b = b,a
+    SWAP              =0x5e, // swap a,b = b,a
     ________________95=0x5f,
     ________________96=0x60,
     ________________97=0x61,
@@ -127,20 +127,20 @@ pub enum Bytecode {
     ________________117=0x75,
     ________________118=0x76,
     ________________119=0x77,
-    NOT    = 0x78, // not
-    EQ     = 0x79, // equal
-    NEQ    = 0x7a, // not equal
-    LT     = 0x7b, // less than
-    GT     = 0x7c, // great than
-    LE     = 0x7d, // less and eq
-    GE     = 0x7e, // great and eq
+    NOT                =0x78, // not
+    EQ                 =0x79, // equal
+    NEQ                =0x7a, // not equal
+    LT                 =0x7b, // less than
+    GT                 =0x7c, // great than
+    LE                 =0x7d, // less and eq
+    GE                 =0x7e, // great and eq
     ________________127=0x7f,
-    ADD   = 0x80, // +
-    SUB   = 0x81, // -
-    MUL   = 0x82, // *
-    DIV   = 0x83, // /
-    MOD   = 0x84,
-    POW   = 0x85,
+    ADD                =0x80, // +
+    SUB                =0x81, // -
+    MUL                =0x82, // *
+    DIV                =0x83, // /
+    MOD                =0x84,
+    POW                =0x85,
     ________________134=0x86,
     ________________135=0x87,
     ________________136=0x88,
@@ -196,9 +196,9 @@ pub enum Bytecode {
     ________________186=0xba,
     ________________187=0xbb,
     ________________188=0xbc,
-    GET    = 0xbd, // local get
-    PUT    = 0xbe, // local put
-    ALLOC  = 0xbf, // local alloc
+    GET                =0xbd, // local get
+    PUT                =0xbe, // local put
+    ALLOC              =0xbf, // local alloc
     ________________192=0xc0,
     ________________193=0xc1,
     ________________194=0xc2,
@@ -242,17 +242,17 @@ pub enum Bytecode {
     ________________232=0xe8,
     ________________233=0xe9,
     ________________234=0xea,
-    BURN  = 0xeb, // just burn gas
-    NOP   = 0xec, // do nothing
-    RET   = 0xed, // ret with data (function return)
-    ABT   = 0xee, // end with error (abort)
-    END   = 0xef, // end with finish
-    JMPL  = 0xf0, // jump long
-    JMPS  = 0xf1, // jump offset
-    JMPSL = 0xf2, // jump offset long
-    BRL   = 0xf3, // branch long
-    BRS   = 0xf4, // branch offset
-    BRSL  = 0xf5, // branch offset long
+    BURN               =0xeb, // just burn gas
+    NOP                =0xec, // do nothing
+    RET                =0xed, // ret with data (function return)
+    ABT                =0xee, // end with error (abort)
+    END                =0xef, // end with finish
+    JMPL               =0xf0, // jump long
+    JMPS               =0xf1, // jump offset
+    JMPSL              =0xf2, // jump offset long
+    BRL                =0xf3, // branch long
+    BRS                =0xf4, // branch offset
+    BRSL               =0xf5, // branch offset long
     ________________246=0xf6,
     ________________247=0xf7,
     ________________248=0xf8,
@@ -262,7 +262,7 @@ pub enum Bytecode {
     ________________252=0xfc,
     ________________253=0xfd,
     ________________254=0xfe,
-    NT    = 0xff, // panic: never touch
+    NT                 =0xff, // panic: never touch
 }
 
 
