@@ -20,9 +20,9 @@ pub fn main_test98237456289375() {
 }
 
 
-pub fn main_vm_machine_call_3746582364523() {
+pub fn main_vm_machine_call(codes: &str) {
 
-    let mut codes = hex::decode("4b21fbfbfbfb").unwrap();
+    let mut codes = hex::decode(codes).unwrap();
 
     let mut gas = 1000000i64;
 
@@ -34,8 +34,12 @@ pub fn main_vm_machine_call_3746582364523() {
     machine.printdebug();
     
 
+}
 
 
+pub fn main_vm_machine_call_3746582364523() {
+
+    main_vm_machine_call("4b21fbfbfbfb");
 
 }
 

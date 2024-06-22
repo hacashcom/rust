@@ -61,7 +61,7 @@ fn main() {
 
     // main_test8327459283();
     // main_test_vecspeed387425983();
-    return main_vm_machine_call_3746582364523();
+    return main_compile_2834756928374();
     
 
     let inicnf = config::load_config();

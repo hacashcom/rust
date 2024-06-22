@@ -69,6 +69,10 @@ impl IRNode for IRNodeDouble {
         self.code as u8
     }
     fn codegen(&self) -> Vec<u8> {
+        let preres = compile_double(self.code, &self.subx, &self.suby);
+        if let Some(codes) = preres {
+            return codes
+        }
         let mut codes = self.subx.codegen(); // x
         codes.append( &mut self.suby.codegen() ); // y
         codes.push(self.bytecode()); // code
@@ -88,6 +92,10 @@ impl IRNode for IRNodeTriple {
         self.code as u8
     }
     fn codegen(&self) -> Vec<u8> {
+        let preres = compile_triple(self.code, &self.subx, &self.suby, &self.subz);
+        if let Some(codes) = preres {
+            return codes
+        }
         let mut codes = self.subx.codegen(); // x 
         codes.append( &mut self.suby.codegen() ); // y
         codes.append( &mut self.subz.codegen() ); // z
@@ -136,6 +144,10 @@ impl IRNode for IRNodeBlock {
         let mut codes = vec![];
         for sub in &self.subs {
             codes.append( &mut sub.codegen() );
+            codes.push(POP as u8); // pop
+        }
+        if codes.len() > 0 {
+            codes.pop(); // drop tail pop
         }
         return codes
     }

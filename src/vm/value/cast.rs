@@ -31,7 +31,7 @@ fn cannot_cast_err(v: &StackItem, ty: &str) -> VmrtErr {
 
 impl StackItem {
 
-        pub fn is_not_zero(&mut self) -> bool {
+    pub fn is_not_zero(&self) -> bool {
         match self {
             Nil => false,
             U8(n)   => *n != 0,
@@ -42,8 +42,12 @@ impl StackItem {
             Buffer(b)  => buf_is_not_zero(b),
         }
     }
+    
+    pub fn is_zero(&self) -> bool {
+        ! self.is_not_zero()
+    }
 
-        pub fn cast_bool(&mut self) -> VmrtErr {
+    pub fn cast_bool(&mut self) -> VmrtErr {
         if self.is_not_zero() {
             *self = U8(1); // true
         } else {

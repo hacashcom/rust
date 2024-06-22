@@ -125,13 +125,19 @@ macro_rules! branch {
     }
 }
 
-macro_rules! ostbranch {
-    ( $ops: expr, $codes: expr, $pc: expr, $tail: expr, $l: expr) => {
-        if $ops.pop()?.is_not_zero() {
+macro_rules! ostbranchex {
+    ( $ops: expr, $codes: expr, $pc: expr, $tail: expr, $l: expr, $cond: ident) => {
+        if $ops.pop()?.$cond() {
             ostjump!($codes, $pc, $tail, $l);
         }else{
             $pc += $l;
         }
+    }
+}
+// is_not_zero
+macro_rules! ostbranch {
+    ( $ops: expr, $codes: expr, $pc: expr, $tail: expr, $l: expr) => {
+        ostbranchex!($ops, $codes, $pc, $tail, $l, is_not_zero)
     }
 }
 
@@ -243,6 +249,7 @@ pub fn execute_code(
             BRL   => branch!(ops, codes, *pc, tail, 2),
             BRS   => ostbranch!(ops, codes, *pc, tail, 1),
             BRSL  => ostbranch!(ops, codes, *pc, tail, 2),   
+            BRNSL => ostbranchex!(ops, codes, *pc, tail, 2, is_zero),   
             // other
             NT  => return itr_err_code!(InstNeverTouch), // never touch
             NOP => {}, // do nothing

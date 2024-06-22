@@ -231,9 +231,9 @@ pub enum Bytecode {
     ________________221=0xdd,
     ________________222=0xde,
     ________________223=0xdf,
-    ________________224=0xe0,
-    ________________225=0xe1,
-    ________________226=0xe2,
+    IR_BLOCK           =0xe0,
+    IR_IF              =0xe1,
+    IR_WHILE           =0xe2,
     ________________227=0xe3,
     ________________228=0xe4,
     ________________229=0xe5,
@@ -253,7 +253,7 @@ pub enum Bytecode {
     BRL                =0xf3, // branch long
     BRS                =0xf4, // branch offset
     BRSL               =0xf5, // branch offset long
-    ________________246=0xf6,
+    BRNSL              =0xf6, // branch not offset long
     ________________247=0xf7,
     ________________248=0xf8,
     ________________249=0xf9,
