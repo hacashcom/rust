@@ -78,7 +78,7 @@ impl Machine {
                 if next_depth >= self.space_limit.call_depth {
                     return itr_err_code!(OutOfCallDepth)
                 }
-                let next_frame = Frame::new(funcptr.mode, next_depth, load_codes, fnargv);
+                let mut next_frame = Frame::new(funcptr.mode, next_depth, load_codes, fnargv);
                 current_frame = next_frame;
                 continue
             }

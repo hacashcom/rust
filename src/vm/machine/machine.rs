@@ -39,6 +39,8 @@ impl Machine {
         }
     }
 
+    
+
     pub fn printdebug(&mut self) {
         println!("call_stacks({}) = {:?}", self.call_stacks.len(), self.call_stacks)
     }

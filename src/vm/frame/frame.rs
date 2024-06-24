@@ -11,6 +11,9 @@ pub struct Frame {
     pub mode: CallMode,
     pub local: Stack,
     pub stack: Stack,
+    //
+    // pub ivk_addr: ContractAddress, // call func
+    // pub sto_addr: ContractAddress, // storage ctx
 } 
 
 
@@ -25,7 +28,6 @@ pub struct FrameExec<'a, 'b> {
     pub gas_limit: &'b mut i64,
     gas_table: &'b GasTable,
     gas_extra: &'b GasExtra,
-
 } 
 
 
