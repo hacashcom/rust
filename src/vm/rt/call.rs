@@ -5,6 +5,14 @@ pub const CONTRACT_ADDRESS_WIDTH: usize = 21;
 
 pub type ContractAddress = [u8; CONTRACT_ADDRESS_WIDTH];
 
+pub fn contract_to_address(ca: &ContractAddress) -> Address {
+    Address::cons(ca.clone())
+}
+
+pub fn address_to_contract(adr: &Address) -> ContractAddress {
+    **adr
+}
+
 
 #[derive(Debug, Clone)]
 pub enum CallTarget {
@@ -13,7 +21,17 @@ pub enum CallTarget {
     Addr(ContractAddress),
 }
 
-#[derive(Debug, Clone, Copy)]
+impl CallTarget {
+    pub fn idx(&self) -> u8 {
+        match self {
+            CallTarget::Libidx(i) => *i,
+            _ => 0,
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CallMode {
     Main,
     System,

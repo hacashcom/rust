@@ -3,6 +3,7 @@
 /*************************************/
 
 
+
 pub struct IRNodeLeaf {
     pub code: Bytecode,
 }
@@ -34,6 +35,39 @@ impl IRNode for IRNodeParams {
     fn codegen(&self) -> Vec<u8> {
         let mut codes = vec![self.bytecode()];
         codes.append( &mut self.para.clone() );
+        return codes
+    }
+}
+
+pub struct IRNodeExtAction {
+    pub code: Bytecode,
+    pub kind: u16,
+    pub body: Vec<u8>,
+}
+
+
+impl IRNode for IRNodeExtAction {
+    fn bytecode(&self) -> u8 {
+        self.code as u8
+    }
+    fn codegen(&self) -> Vec<u8> {
+        let mut codes = vec![];
+        let mut bdbts = self.body.clone();
+        let bdlen = bdbts.len();
+        if bdlen == 0 {
+            codes.push(Bytecode::PUSHNBUF as u8); // push buf empth
+        } else if bdlen <= 256 {
+            codes.push(Bytecode::PUSHBUF as u8); // push buf
+            codes.push(bdlen as u8 - 1);
+        } else if bdlen <= 65536 {
+            codes.push(Bytecode::PUSHBUFL as u8); // push buf long
+            codes.append(&mut (bdlen as u16 - 1).to_be_bytes().to_vec());
+        } else {
+            panic!("{}", "IRNodeExtAction codegen: ext action length too long")
+        }
+        codes.append( &mut bdbts );
+        let mut kindbts = self.kind.to_be_bytes().to_vec();
+        codes.append( &mut kindbts );
         return codes
     }
 }

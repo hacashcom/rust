@@ -1,48 +1,47 @@
 
-pub struct Machine {
+pub struct Machine<'a> {
     gas_table: GasTable,
     gas_extra: GasExtra,
-    space_limit: SpaceLimit,
-    // entry_codes: Vec<u8>,
+    space_cap: SpaceCap,
     gas_limit: i64,
-    call_stacks: CallStack,
     global_vals: KVMap,
-    memory_secs: HashMap<Address, KVMap>,
+    memory_vals: HashMap<ContractAddress, KVMap>,
+    // call_stacks: CallStack,
+    extcaller: &'a mut dyn ExtActCaller,
     out_storage: u8,
     // 
     code_loader: u8,
+    // 
+    // entry_codes: Vec<u8>,
 }
 
 
 
-impl Machine {
+impl Machine<'_> {
 
-    pub fn new(gas: i64, codes: Vec<u8>) -> Machine {
-        let space_limit = SpaceLimit::new();
-        let gas_table = GasTableW::new();
+    pub fn new<'a>(gas_limit: i64, extcaller: &'a mut dyn ExtActCaller) -> Machine<'a> {
+        let space_cap = SpaceCap::new();
+        let gas_table = GasTable::new();
         let gas_extra = GasExtra::new();
-        let mut call_stack = CallStack::new();
-        let depth = 0usize;
-        let main_frame = Frame::new(CallMode::Main, depth, codes, StackItem::nil());
-        call_stack.push(main_frame).unwrap();
+        // let call_stacks = CallStack::new();
         Machine {
-            gas_limit: gas,
-            gas_table: gas_table,
-            gas_extra: gas_extra,
-            space_limit: space_limit,
-            // entry_codes: codes,
-            call_stacks: call_stack,
+            gas_limit,
+            gas_table,
+            gas_extra,
+            space_cap,
+            // call_stacks,
             global_vals: KVMap::new(),
-            memory_secs: HashMap::new(),
+            memory_vals: HashMap::new(),
+            extcaller,
             out_storage: 0,
             code_loader: 0,
         }
     }
 
-    
+
 
     pub fn printdebug(&mut self) {
-        println!("call_stacks({}) = {:?}", self.call_stacks.len(), self.call_stacks)
+        println!("gas_limit = {}", self.gas_limit)
     }
 
 }

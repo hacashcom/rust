@@ -116,7 +116,8 @@ pub fn parse_ir_node_must(stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRN
         }
         // leaf
         PUSH0
-        | PUSH1 => {
+        | PUSH1 
+        | PUSHNBUF => {
             Box::new(IRNodeLeaf{code: inst})
         }
         // inst invalid

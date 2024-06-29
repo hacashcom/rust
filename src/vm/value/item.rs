@@ -18,8 +18,13 @@ impl StackItem {
     pub fn nil() -> StackItem {
         Nil
     }
+
     pub fn empty_buf() -> StackItem {
         Buffer(vec![])
+    }
+    
+    pub fn buf(b: Vec<u8>) -> StackItem {
+        Buffer(b)
     }
 
     pub fn val_size(&self) -> usize {

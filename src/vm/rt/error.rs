@@ -8,7 +8,8 @@ pub enum ItrErrCode {
     CodeOverRun = 2, // pc out of limit
     
     InstInvalid    = 5, // 
-    InstNeverTouch = 6, // 
+    InstDisabled   = 6, // 
+    InstNeverTouch = 7, // 
     
     OutOfGas       = 11,
     OutOfStack     = 12,
@@ -32,6 +33,10 @@ pub enum ItrErrCode {
     CastFail = 36,
     
     Arithmetic = 41,
+    BufferHandle = 42,
+    NativeCall = 43,
+
+    ExtActCallError = 51,
 
     ThrowAbort = 101, // user code call
 }

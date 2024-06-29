@@ -16,7 +16,9 @@ pub mod value;
 pub mod stack;
 pub mod frame;
 pub mod interpreter;
+pub mod native;
 pub mod action;
+pub mod contract;
 pub mod machine;
 
 

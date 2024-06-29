@@ -12,28 +12,33 @@ pub struct Frame {
     pub local: Stack,
     pub stack: Stack,
     //
-    // pub ivk_addr: ContractAddress, // call func
-    // pub sto_addr: ContractAddress, // storage ctx
+    pub ivk_addr: ContractAddress, // call func
+    pub ctx_addr: ContractAddress, // storage and local ctx
 } 
 
 
 pub struct FrameExec<'a, 'b> {
-    depth: &'a usize,
+    is_sys_call: bool,
+    depth: usize,
+    //
     codes: &'a [u8],
     pub pc: &'a mut usize,
     mode: &'a CallMode,
     local: &'a mut Stack,
     stack: &'a mut Stack,
+    ivk_addr: &'a ContractAddress,
+    ctx_addr: &'a ContractAddress,
     // machine
     pub gas_limit: &'b mut i64,
     gas_table: &'b GasTable,
     gas_extra: &'b GasExtra,
+    extcaller: &'b mut dyn ExtActCaller,
 } 
 
 
 impl Frame {
 
-    pub fn new(mode: CallMode, deep: usize, codes:Vec<u8>, input: StackItem) -> Frame {
+    pub fn new(ivk: ContractAddress, sto: ContractAddress, mode: CallMode, deep: usize, codes:Vec<u8>, input: StackItem) -> Frame {
         let mut locals = Stack::new(256);
         locals.push(input).unwrap(); // function args
         Frame {
@@ -43,6 +48,8 @@ impl Frame {
             codes: codes,
             local: locals,
             stack: Stack::new(256),
+            ivk_addr: ivk,
+            ctx_addr: sto,
         }
     }
 
@@ -50,17 +57,23 @@ impl Frame {
         gas_limit: &'b mut i64,
         gas_table: &'b GasTable,
         gas_extra: &'b GasExtra,
+        extcaller: &'b mut dyn ExtActCaller,
+        is_sys_call: bool,
     ) -> FrameExec<'a, 'b> {
         FrameExec {
+            is_sys_call,
+            depth: self.depth,
             mode: &self.mode,
             pc: &mut self.pc,
             codes: &self.codes,
-            depth: &self.depth,
             local: &mut self.local,
             stack: &mut self.stack,
+            ivk_addr: &self.ivk_addr,
+            ctx_addr: &self.ctx_addr,
             gas_limit,
             gas_table,
             gas_extra,
+            extcaller,
         } 
     }
 

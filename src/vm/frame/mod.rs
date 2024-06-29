@@ -1,10 +1,10 @@
 
 
+use crate::interface::vm::*;
 
 use super::rt::*;
 use super::value::*;
 use super::stack::*;
-use super::interpreter::*;
 
 
 

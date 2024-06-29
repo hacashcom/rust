@@ -1,9 +1,7 @@
 
 use std::collections::{ HashMap };
 
-
-use crate::core::field::*;
-
+use crate::interface::vm::*;
 
 use super::rt::*;
 use super::rt::CallExit::*;
