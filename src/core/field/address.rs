@@ -11,6 +11,12 @@ pub const ADDRESS_SIZE: usize = Address::width();
 // format
 impl Address {
 
+    pub fn min() -> Address {
+        Fixed21 {
+            bytes: [0u8; 21],
+        }
+    }
+
     pub fn form_readable(addr: &str) -> Result<Address, Error> {
         let res = addr.from_base58check();
         if let Err(_) = res {

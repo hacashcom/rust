@@ -4,8 +4,10 @@
 #[repr(u8)]
 #[derive(Debug)]
 pub enum ItrErrCode {
-    CodeTooLong = 1, // code length
-    CodeOverRun = 2, // pc out of limit
+    ContractError = 1,
+    CodeTypeError = 2,
+    CodeTooLong = 3, // code length
+    CodeOverRun = 4, // pc out of limit
     
     InstInvalid    = 5, // 
     InstDisabled   = 6, // 
@@ -18,6 +20,7 @@ pub enum ItrErrCode {
     OutOfMemory    = 15,
     OutOfGlobal    = 16,
     OutOfCallDepth = 17,
+    OutOfLoadContract = 18,
     
     GasError    = 21,
     StackError  = 22,

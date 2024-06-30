@@ -44,13 +44,13 @@ async fn scan_coin_transfer(State(ctx): State<ApiCtx>, q: Query<Q4538>) -> impl 
 
 
 
-macro_rules! transfer_scan_action_item{
+macro_rules! transfer_scan_action_item {
     ( $kid: expr, $aext: expr, $transfers: expr, $actname: ident, $acty: ty, $ck: expr, $jsonobj: expr ) => (
         if $kid == <$acty>::kid(){
             if false == $ck {
                 return
             }
-            let ($actname, _) = <$acty>::create(&$aext.serialize()).unwrap();
+            let $actname = <$acty>::build(&$aext.serialize()).unwrap();
             $transfers.push($jsonobj);
             return
         }

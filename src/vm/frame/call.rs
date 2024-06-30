@@ -14,7 +14,7 @@ macro_rules! do_execute_code {
             $self.gas_limit,
             $self.gas_table,
             $self.gas_extra,
-            $self.extcaller,
+            $self.extn_caller,
             $self.local,
             $self.stack,
             $self.is_sys_call,

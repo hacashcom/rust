@@ -4,6 +4,7 @@ use crate::sys::*;
 use crate::core::field::*;
 
 
+include!("types.rs");
 include!("bytecode.rs");
 include!("gas.rs");
 include!("spcap.rs");

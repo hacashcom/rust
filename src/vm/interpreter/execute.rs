@@ -170,7 +170,7 @@ pub fn execute_code(
     gas_table: &GasTable, // len = 256
     gas_extra: &GasExtra,
 
-    extactcaller: &mut dyn ExtActCaller,
+    extactcaller: &dyn ExtActCaller,
 
     locals: &mut Stack,
     operand_stack: &mut Stack,
@@ -305,7 +305,7 @@ pub fn execute_code(
             CALLSTATIC => return Ok(funcptr!(codes, *pc, tail, CallMode::Static)),
             CALLLIB =>    return Ok(funcptr!(codes, *pc, tail, CallMode::Library)),
             CALLLOC =>    return Ok(Call(Funcptr{
-                mode: CallMode::Inherit,
+                mode: CallMode::InheritLoc,
                 target: CallTarget::Inherit,
                 fnsign: pcutbuf!(FN_SIGN_WIDTH),
             })),

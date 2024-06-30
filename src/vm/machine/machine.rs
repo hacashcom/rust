@@ -1,5 +1,5 @@
 
-pub struct Machine<'a> {
+pub struct Machine {
     gas_table: GasTable,
     gas_extra: GasExtra,
     space_cap: SpaceCap,
@@ -7,19 +7,21 @@ pub struct Machine<'a> {
     global_vals: KVMap,
     memory_vals: HashMap<ContractAddress, KVMap>,
     // call_stacks: CallStack,
-    extcaller: &'a mut dyn ExtActCaller,
-    out_storage: u8,
-    // 
-    code_loader: u8,
-    // 
+    extn_caller: Arc<dyn ExtActCaller>,
+    out_storage: Arc<dyn OutStorager>,
     // entry_codes: Vec<u8>,
+    contract_cache: HashMap<ContractAddress, ContractStorage>,
 }
 
 
 
-impl Machine<'_> {
+impl Machine {
 
-    pub fn new<'a>(gas_limit: i64, extcaller: &'a mut dyn ExtActCaller) -> Machine<'a> {
+    pub fn new(
+        gas_limit: i64, 
+        extn_caller: Arc<dyn ExtActCaller>,
+        out_storage: Arc<dyn OutStorager>,
+    ) -> Machine {
         let space_cap = SpaceCap::new();
         let gas_table = GasTable::new();
         let gas_extra = GasExtra::new();
@@ -32,9 +34,9 @@ impl Machine<'_> {
             // call_stacks,
             global_vals: KVMap::new(),
             memory_vals: HashMap::new(),
-            extcaller,
-            out_storage: 0,
-            code_loader: 0,
+            extn_caller,
+            out_storage,
+            contract_cache: HashMap::new(),
         }
     }
 

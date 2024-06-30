@@ -32,7 +32,7 @@ pub struct FrameExec<'a, 'b> {
     pub gas_limit: &'b mut i64,
     gas_table: &'b GasTable,
     gas_extra: &'b GasExtra,
-    extcaller: &'b mut dyn ExtActCaller,
+    extn_caller: &'b dyn ExtActCaller,
 } 
 
 
@@ -57,7 +57,7 @@ impl Frame {
         gas_limit: &'b mut i64,
         gas_table: &'b GasTable,
         gas_extra: &'b GasExtra,
-        extcaller: &'b mut dyn ExtActCaller,
+        extn_caller: &'b dyn ExtActCaller,
         is_sys_call: bool,
     ) -> FrameExec<'a, 'b> {
         FrameExec {
@@ -73,7 +73,7 @@ impl Frame {
             gas_limit,
             gas_table,
             gas_extra,
-            extcaller,
+            extn_caller,
         } 
     }
 

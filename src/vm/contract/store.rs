@@ -5,22 +5,26 @@ StructFieldList!(ContractAddrsssList, count, Uint1, addrs, Address);
 
 // Contract Head
 StructFieldStruct!{ ContractHead, 
-	marks: Fixed8
-	iheritis: ContractAddrsssList
+    vrsn: Fixed1
+	marks: Fixed7
+	inherits: ContractAddrsssList
     librarys: ContractAddrsssList
+	mexts: Fixed1
 }
 
 // Contract System Call
 StructFieldStruct!{ ContractSystemCall, 
-    mark: Fixed2
-	sign: Uint1
+    mark: Fixed1
+    vrsn: Fixed1 // 5bit, 3bit8=codetype
+	sign: Fixed1
     code: BytesW2
 }
 
 // Contract User Func
 StructFieldStruct!{ ContractClientFunc, 
-    mark: Fixed4
-	sign: Uint4
+    mark: Fixed3
+    vrsn: Fixed1 // 5bit, 3bit8=codetype
+	sign: Fixed4
     code: BytesW2
 }
 
@@ -32,10 +36,13 @@ StructFieldList!(ContractClientFuncList, fnums, Uint2, funcs, ContractClientFunc
 //////////////////////////////////////
 
 
-
 // Contract
-StructFieldStruct!{ Contract, 
+StructFieldStruct!{ ContractStorage, 
 	contlhead: ContractHead
 	sytmcalls: ContractSystemCallList
-	functions: ContractClientFuncList
+	userfuncs: ContractClientFuncList
+    morextend: Fixed2
 }
+
+
+

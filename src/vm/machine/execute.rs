@@ -1,13 +1,15 @@
 
 
-impl Machine<'_> {
+impl Machine {
 
 
-    pub fn main_call(&mut self, caller: ContractAddress, codes: Vec<u8>) -> VmrtRes<StackItem> {
+    pub fn main_call(&mut self, caller: &Address, codes: Vec<u8>) -> VmrtRes<StackItem> {
+        let caller = address_to_contract(caller);
         self.do_call(caller, codes, StackItem::nil(), false)
     }
 
-    pub fn sys_call(&mut self, caller: ContractAddress, codes: Vec<u8>, input: Vec<u8>) -> VmrtRes<StackItem> {
+    pub fn sys_call(&mut self, caller: &Address, codes: Vec<u8>, input: Vec<u8>) -> VmrtRes<StackItem> {
+        let caller = address_to_contract(caller);
         self.do_call(caller, codes, StackItem::buf(input), true)
     }
 
@@ -30,16 +32,27 @@ impl Machine<'_> {
         let mut current_frame = Frame::new(caller.clone(), caller, call_mode, 0usize, codes, input);
         let mut call_stacks = CallStack::new();
 
+
+        macro_rules! create_frame_exec {
+            () => {
+                current_frame.exec(
+                    &mut self.gas_limit,
+                    &self.gas_table,
+                    &self.gas_extra,
+                    self.extn_caller.as_ref(),
+                    is_sys_call,
+                )
+            }
+        }
+
         loop {
 
-            let cur_ivk_addr = current_frame.ivk_addr;
-            let mut frame_exec = current_frame.exec(
-                &mut self.gas_limit,
-                &self.gas_table,
-                &self.gas_extra,
-                self.extcaller,
-                is_sys_call,
-            );
+            let cur_ctx_addr = current_frame.ctx_addr.clone();
+            let cur_ivk_addr = current_frame.ivk_addr.clone();
+            let mut next_ctx_addr = cur_ctx_addr.clone();
+
+            // do call
+            let mut frame_exec = create_frame_exec!();
             let result = frame_exec.call()?;
 
             // abort
@@ -81,16 +94,17 @@ impl Machine<'_> {
             }
 
             // load code
-            let mut next_ivk_addr = cur_ivk_addr;
-            let mut next_sto_addr = cur_ivk_addr;
-            let mut load_codes = hex::decode("4b4458be002301f5f5f5f5").unwrap();
-            if call_stacks.len() >= 5 {
-                load_codes = hex::decode("4aee").unwrap(); // abort
-            }
+            let (contract_addr, load_codes) = self.load_codes_by_funcptr(
+                &cur_ctx_addr,
+                &cur_ivk_addr,
+                &funcptr,
+            )?;
+            let mut next_ivk_addr = contract_addr;
 
             // mode: code
             if let Code = funcptr.mode {
                 let mut pc = 0usize;
+                let mut frame_exec = create_frame_exec!();
                 let res = frame_exec.call_code(&load_codes, &mut pc)?;
                 let (Tailend | Finish) = res else {
                     return itr_err_fmt!(CallExitInvalid, 
@@ -101,7 +115,7 @@ impl Machine<'_> {
             }
 
             // normal call
-            if let External | Inherit | Library | Static = funcptr.mode {
+            if let External | InheritLoc | Library | Static = funcptr.mode {
                 // save prev frame
                 let fnargv = current_frame.stack.pop()?; // func argv
                 call_stacks.push(current_frame)?;
@@ -112,11 +126,10 @@ impl Machine<'_> {
                 }
                 if External == funcptr.mode {
                     if let CallTarget::Addr(adr) = funcptr.target {
-                        next_ivk_addr = adr.clone();
-                        next_sto_addr = adr.clone();
+                        next_ctx_addr = adr.clone();
                     }
                 }
-                let mut next_frame = Frame::new(next_ivk_addr, next_sto_addr, 
+                let mut next_frame = Frame::new(next_ivk_addr, next_ctx_addr, 
                     funcptr.mode, next_depth, load_codes, fnargv);
                 current_frame = next_frame;
                 continue
