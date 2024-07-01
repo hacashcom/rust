@@ -34,7 +34,7 @@ pub fn main_vm_machine_call(codes: &str) {
     let adr1 = Address::min();
     println!("Address::min() = {}", &adr1.readable());
 
-    let res = machine.main_call(&adr1, codes);
+    let res = machine.main_call(&adr1, &codes);
 
     println!("vm machine call res = {:?}", res);
     machine.printdebug();

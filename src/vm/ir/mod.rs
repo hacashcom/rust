@@ -1,5 +1,8 @@
 
 
+
+use crate::interface::vm::*;
+
 use crate::interface::ir::*;
 use super::rt::*;
 use super::rt::Bytecode::*;

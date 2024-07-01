@@ -1,18 +1,36 @@
 
 
+/**
+* parse ir list
+*/
+pub fn parse_ir_list(extact: &dyn ExtActCaller, number: usize, stuff: &[u8]) -> VmrtRes<IRNodeBlock> {
+    let codelen = stuff.len();
+    if codelen > u16::MAX as usize {
+        return itr_err_code!(CodeTooLong)
+    }
+    let mut block = IRNodeBlock::with_capacity(number);
+    let mut seek = 0;
+    for i in 0..number {
+        let irnode = parse_ir_node_must(extact, stuff, &mut seek)?;
+        block.push(irnode);
+    }
+    // finish
+    Ok(block)
+}
+
 
 
 /**
 * parse ir block
 */
-pub fn parse_ir_list(stuff: &[u8], seek: &mut usize) -> VmrtRes<IRNodeBlock> {
+pub fn parse_ir_block(extact: &dyn ExtActCaller, stuff: &[u8], seek: &mut usize) -> VmrtRes<IRNodeBlock> {
     let codelen = stuff.len();
     if codelen > u16::MAX as usize {
         return itr_err_code!(CodeTooLong)
     }
     let mut block = IRNodeBlock::new();
     loop {
-        let pres = parse_ir_node(stuff, seek)?;
+        let pres = parse_ir_node(extact, stuff, seek)?;
         let Some(irnode) = pres else {
             break // end
         };
@@ -24,25 +42,35 @@ pub fn parse_ir_list(stuff: &[u8], seek: &mut usize) -> VmrtRes<IRNodeBlock> {
 
 
 
+
+
 /**
 * parse one node
 */
-pub fn parse_ir_node(stuff: &[u8], seek: &mut usize) -> VmrtRes<Option<Box<dyn IRNode>>> {
+pub fn parse_ir_node(extact: &dyn ExtActCaller, stuff: &[u8], seek: &mut usize) -> VmrtRes<Option<Box<dyn IRNode>>> {
     let codesz = stuff.len();
     if codesz == 0 || *seek >= codesz {
         return Ok(None) // finish end
     }
-    Ok(Some(parse_ir_node_must(stuff, seek)?))
+    Ok(Some(parse_ir_node_must(extact, stuff, seek)?))
 }
 
 // must
-pub fn parse_ir_node_must(stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRNode>> {
+pub fn parse_ir_node_must(extact: &dyn ExtActCaller, stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRNode>> {
 
     let codesz = stuff.len();
     if codesz == 0 || *seek >= codesz {
         return itr_err_code!(CodeOverRun)
     }
     
+    // code
+    let insbyte = stuff[*seek];// u8
+    let inst: Bytecode = unsafe { std::mem::transmute(insbyte) };
+    // parse
+    let mut irnode: Box<dyn IRNode>;
+    // mv sk
+    *seek += 1;
+
     macro_rules! itrbuf {
         ($l: expr) => {
             {
@@ -56,37 +84,59 @@ pub fn parse_ir_node_must(stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRN
             }
         }
     }
-    // code
-    let insbyte = stuff[*seek];// u8
-    let inst: Bytecode = unsafe { std::mem::transmute(insbyte) };
-    // parse
-    let mut irnode: Box<dyn IRNode>;
-    // mv sk
-    *seek += 1;
+
+    macro_rules! itrkind {
+        () => { {
+            let p = vec![inst as u8, itrbuf!(1)[0]];
+            let n = u16::from_be_bytes(p.try_into().unwrap());
+            n
+        } }
+    }
+
     irnode = match inst {
+        // ext action
+        EXTACTION | EXTFUNC => {
+            let kind: u16 = itrkind!();
+            let body = extact.cutout(&stuff[*seek..]).map_err(|e|
+                ItrErr::new(ExtActCallError, &format!("parse error: {}", &e)))?;
+            *seek += body.len();
+            Box::new(IRNodeExtAction{
+                inst,
+                kind,
+                body,
+            })
+        }
+        EXTENV => {
+            let kind: u16 = itrkind!();
+            Box::new(IRNodeExtAction{
+                inst,
+                kind,
+                body: vec![],
+            })
+        }
         // block IF WHILE
         IR_BLOCK => {
             let mut block = IRNodeBlock::new();
             let p = itrbuf!(2);
             let n = u16::from_be_bytes(p.try_into().unwrap());
             for i in 0..n {
-                block.push(parse_ir_node_must(stuff, seek)?);
+                block.push(parse_ir_node_must(extact, stuff, seek)?);
             }
             Box::new(block)
         }
         IR_IF => {
             Box::new(IRNodeTriple{
-                code: inst,
-                subx: parse_ir_node_must(stuff, seek)?,
-                suby: parse_ir_node_must(stuff, seek)?,
-                subz: parse_ir_node_must(stuff, seek)?,
+                inst,
+                subx: parse_ir_node_must(extact, stuff, seek)?,
+                suby: parse_ir_node_must(extact, stuff, seek)?,
+                subz: parse_ir_node_must(extact, stuff, seek)?,
             })
         }
         IR_WHILE => {
             Box::new(IRNodeDouble{
-                code: inst,
-                subx: parse_ir_node_must(stuff, seek)?,
-                suby: parse_ir_node_must(stuff, seek)?,
+                inst,
+                subx: parse_ir_node_must(extact, stuff, seek)?,
+                suby: parse_ir_node_must(extact, stuff, seek)?,
             })
         }
         // triple
@@ -95,9 +145,9 @@ pub fn parse_ir_node_must(stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRN
         ADD
         | SUB => {
             Box::new(IRNodeDouble{
-                code: inst,
-                subx: parse_ir_node_must(stuff, seek)?,
-                suby: parse_ir_node_must(stuff, seek)?,
+                inst,
+                subx: parse_ir_node_must(extact, stuff, seek)?,
+                suby: parse_ir_node_must(extact, stuff, seek)?,
             })
         }
         // single
@@ -110,15 +160,15 @@ pub fn parse_ir_node_must(stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRN
         | CASTU128
         | CASTBUF => {
             Box::new(IRNodeSingle{
-                code: inst,
-                subx: parse_ir_node_must(stuff, seek)?,
+                inst,
+                subx: parse_ir_node_must(extact, stuff, seek)?,
             })
         }
         // leaf
         PUSH0
         | PUSH1 
         | PUSHNBUF => {
-            Box::new(IRNodeLeaf{code: inst})
+            Box::new(IRNodeLeaf{inst})
         }
         // inst invalid
         _ => return itr_err_code!(InstInvalid),

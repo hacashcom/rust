@@ -33,11 +33,22 @@ impl Machine {
         }
     }
 
+    fn load_codes_by_syscall(&mut self, taradr: &ContractAddress, syscall: SystemCallType) 
+        -> VmrtRes<Vec<u8>>
+    {
+        let extact = self.extn_caller.clone();
+        let target_contract = self.load_contract(taradr)?;
+        target_contract.load_syscall(syscall, extact.as_ref())
+    }
+
+
     fn load_codes_by_funcptr(&mut self, ctxadr: &ContractAddress, ivkadr: &ContractAddress, fnptr: &Funcptr) 
-    -> VmrtRes<(ContractAddress, Vec<u8>)> {
+        -> VmrtRes<(ContractAddress, Vec<u8>)> 
+    {
 
         use CallMode::*;
         use CallTarget::*;
+
 
         let mut target_addr = ivkadr.clone();
         let fnsign = fnptr.fnsign;
@@ -61,11 +72,12 @@ impl Machine {
             let ctxcont = self.load_contract(ctxadr)?;
             let mut adrlist = ctxcont.inherits();
             adrlist.insert(0, ctxadr.clone());
-            for adr in adrlist { // do search in inherits
+            // do search in inherits
+            for adr in adrlist {
                 target_addr = adr;
                 let ctobj = self.load_contract(&target_addr)?;
                 if ctobj.check_usrfunc(&fnsign) {
-                    break // search exist
+                    break // okn  search exist
                 }
             }
         }else {
@@ -73,8 +85,9 @@ impl Machine {
             return itr_err_code!(ContractError)
         }
         // read func
+        let extact = self.extn_caller.clone();
         let target_contract = self.load_contract(&target_addr)?;
-        let resfn = target_contract.load_usrfunc(&fnsign)?;
+        let resfn = target_contract.load_usrfunc(&fnsign, extact.as_ref())?;
         Ok((target_addr, resfn))
     }
 

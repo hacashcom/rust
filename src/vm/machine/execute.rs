@@ -3,21 +3,29 @@
 impl Machine {
 
 
-    pub fn main_call(&mut self, caller: &Address, codes: Vec<u8>) -> VmrtRes<StackItem> {
-        let caller = address_to_contract(caller);
-        self.do_call(caller, codes, StackItem::nil(), false)
+    pub fn main_call(&mut self, entry: &Address, irs: &[u8]) -> VmrtRes<StackItem> {
+        // parse
+        let count = u16::from_be_bytes(irs[0..2].try_into().unwrap());
+        let codes = parse_ir_list(
+            self.extn_caller.clone().as_ref(), 
+            count as usize,
+            &irs[2..],
+        )?.codegen();
+        let entry = address_to_contract(entry);
+        self.do_call(entry, codes, StackItem::nil(), false)
     }
 
-    pub fn sys_call(&mut self, caller: &Address, codes: Vec<u8>, input: Vec<u8>) -> VmrtRes<StackItem> {
-        let caller = address_to_contract(caller);
-        self.do_call(caller, codes, StackItem::buf(input), true)
+    pub fn sys_call(&mut self, entry: &Address, fnty: SystemCallType, input: Vec<u8>) -> VmrtRes<StackItem> {
+        let entry = address_to_contract(entry);
+        let codes = self.load_codes_by_syscall(&entry, fnty)?;
+        self.do_call(entry, codes, StackItem::buf(input), true)
     }
 
 
     /*
     * do call
     */
-    fn do_call(&mut self, caller: ContractAddress, codes: Vec<u8>, input: StackItem, is_sys_call: bool) -> VmrtRes<StackItem> {
+    fn do_call(&mut self, entry: ContractAddress, codes: Vec<u8>, input: StackItem, is_sys_call: bool) -> VmrtRes<StackItem> {
 
         use CallMode::*;
 
@@ -29,7 +37,7 @@ impl Machine {
         }
 
         let mut retval = StackItem::nil(); 
-        let mut current_frame = Frame::new(caller.clone(), caller, call_mode, 0usize, codes, input);
+        let mut current_frame = Frame::new(entry.clone(), entry, call_mode, 0usize, codes, input);
         let mut call_stacks = CallStack::new();
 
 

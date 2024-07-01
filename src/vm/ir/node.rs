@@ -5,12 +5,12 @@
 
 
 pub struct IRNodeLeaf {
-    pub code: Bytecode,
+    pub inst: Bytecode,
 }
 
 impl IRNode for IRNodeLeaf {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     // fn parsing(&mut self, buf: &[u8], seek: &mut usize) -> RetErr {
     //     self.code = buf[*seek] ;
@@ -24,13 +24,13 @@ impl IRNode for IRNodeLeaf {
 
 
 pub struct IRNodeParams {
-    pub code: Bytecode,
+    pub inst: Bytecode,
     pub para: Vec<u8>,
 }
 
 impl IRNode for IRNodeParams {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     fn codegen(&self) -> Vec<u8> {
         let mut codes = vec![self.bytecode()];
@@ -40,7 +40,7 @@ impl IRNode for IRNodeParams {
 }
 
 pub struct IRNodeExtAction {
-    pub code: Bytecode,
+    pub inst: Bytecode,
     pub kind: u16,
     pub body: Vec<u8>,
 }
@@ -48,9 +48,15 @@ pub struct IRNodeExtAction {
 
 impl IRNode for IRNodeExtAction {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     fn codegen(&self) -> Vec<u8> {
+        // no body
+        if Bytecode::EXTENV == self.inst {
+            let kindbts = self.kind.to_be_bytes().to_vec();
+            return kindbts // no param, just read
+        }
+        // have body
         let mut codes = vec![];
         let mut bdbts = self.body.clone();
         let bdlen = bdbts.len();
@@ -77,13 +83,13 @@ impl IRNode for IRNodeExtAction {
 
 
 pub struct IRNodeSingle {
-    pub code: Bytecode,
+    pub inst: Bytecode,
     pub subx: Box<dyn IRNode>,
 }
 
 impl IRNode for IRNodeSingle {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     fn codegen(&self) -> Vec<u8> {
         let mut codes = self.subx.codegen(); // x
@@ -93,17 +99,17 @@ impl IRNode for IRNodeSingle {
 }
 
 pub struct IRNodeDouble {
-    pub code: Bytecode,
+    pub inst: Bytecode,
     pub subx: Box<dyn IRNode>,
     pub suby: Box<dyn IRNode>,
 }
 
 impl IRNode for IRNodeDouble {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     fn codegen(&self) -> Vec<u8> {
-        let preres = compile_double(self.code, &self.subx, &self.suby);
+        let preres = compile_double(self.inst, &self.subx, &self.suby);
         if let Some(codes) = preres {
             return codes
         }
@@ -115,7 +121,7 @@ impl IRNode for IRNodeDouble {
 }
 
 pub struct IRNodeTriple {
-    pub code: Bytecode,
+    pub inst: Bytecode,
     pub subx: Box<dyn IRNode>,
     pub suby: Box<dyn IRNode>,
     pub subz: Box<dyn IRNode>,
@@ -123,10 +129,10 @@ pub struct IRNodeTriple {
 
 impl IRNode for IRNodeTriple {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     fn codegen(&self) -> Vec<u8> {
-        let preres = compile_triple(self.code, &self.subx, &self.suby, &self.subz);
+        let preres = compile_triple(self.inst, &self.subx, &self.suby, &self.subz);
         if let Some(codes) = preres {
             return codes
         }
@@ -143,14 +149,14 @@ impl IRNode for IRNodeTriple {
 
 
 pub struct IRNodeParaSingle {
-    pub code: Bytecode,
+    pub inst: Bytecode,
     pub para: Vec<u8>,
     pub subx: Box<dyn IRNode>,
 }
 
 impl IRNode for IRNodeParaSingle {
     fn bytecode(&self) -> u8 {
-        self.code as u8
+        self.inst as u8
     }
     fn codegen(&self) -> Vec<u8> {
         let mut codes = self.subx.codegen(); // x
@@ -188,10 +194,14 @@ impl IRNode for IRNodeBlock {
 }
 
 impl IRNodeBlock {
-    // 
     fn new() -> IRNodeBlock {
         IRNodeBlock{
             subs: vec![],
+        }
+    }
+    fn with_capacity(n: usize) -> IRNodeBlock {
+        IRNodeBlock{
+            subs: Vec::with_capacity(n),
         }
     }
     fn push(&mut self, sub: Box<dyn IRNode>) {

@@ -40,11 +40,11 @@ impl ContractStorage {
     }
 
     // return bytecodes
-    pub fn load_usrfunc(&self, fnsign: &FnSign) -> VmrtRes<Vec<u8>> {
+    pub fn load_usrfunc(&self, fnsign: &FnSign, extact: &dyn ExtActCaller) -> VmrtRes<Vec<u8>> {
         let ary = self.userfuncs.list();
         for a in ary {
             if fnsign == a.sign.as_ref() {
-                return convert_to_bytecodes(a)
+                return convert_to_bytecodes(extact, a)
             }
         }
         // not find
@@ -52,12 +52,12 @@ impl ContractStorage {
     }
 
     // return bytecodes
-    pub fn load_syscall(&self, fnty: SystemCallType) -> VmrtRes<Vec<u8>> {
+    pub fn load_syscall(&self, fnty: SystemCallType, extact: &dyn ExtActCaller) -> VmrtRes<Vec<u8>> {
         let fnty: u8 = fnty as u8;
         let ary = self.sytmcalls.list();
         for a in ary {
             if fnty == a.sign[0] {
-                return convert_to_bytecodes(a)
+                return convert_to_bytecodes(extact, a)
             }
         }
         // not find

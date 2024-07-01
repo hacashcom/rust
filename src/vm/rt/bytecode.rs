@@ -5,7 +5,7 @@
 
 
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Bytecode {
     EXTACTION        =0x00,
     ________________1=0x01,

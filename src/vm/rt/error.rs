@@ -2,7 +2,7 @@
 
 // error define
 #[repr(u8)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum ItrErrCode {
     ContractError = 1,
     CodeTypeError = 2,
