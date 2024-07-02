@@ -9,7 +9,7 @@
         engraved_type     : Uint1 //  0:String  1:CompressedDict  51:MD5  52:SHA256 ....
         engraved_content  : BytesW1
     ),
-    ACTLV_TOP_ONLY, // level
+    ACTLV_TOP_UNIQUE, // level
     11 + 1, // gas
     (self, env, state, store), // params
     false, // burn 90

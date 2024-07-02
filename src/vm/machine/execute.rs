@@ -7,7 +7,6 @@ impl Machine {
         // parse
         let count = u16::from_be_bytes(irs[0..2].try_into().unwrap());
         let codes = parse_ir_list(
-            self.extn_caller.clone().as_ref(), 
             count as usize,
             &irs[2..],
         )?.codegen();

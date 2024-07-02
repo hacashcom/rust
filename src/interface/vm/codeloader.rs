@@ -6,8 +6,8 @@
 // }
 
 
-pub trait CodeLoader {
-    // return: code(type, data)
-    fn load(&self, contract: [u8; 21], fnsign: [u8; 4] ) -> Result<(u8, Rc<Vec<u8>>, Rc<Vec<u8>>, Rc<Vec<u8>>), Error>;
-}
+// pub trait CodeLoader {
+//     // return: code(type, data)
+//     fn load(&self, contract: [u8; 21], fnsign: [u8; 4] ) -> Result<(u8, Rc<Vec<u8>>, Rc<Vec<u8>>, Rc<Vec<u8>>), Error>;
+// }
 

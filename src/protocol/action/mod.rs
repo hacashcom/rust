@@ -17,4 +17,6 @@ use crate::protocol::operate::*;
 include!("level.rs");
 include!("macro.rs");
 include!("hacash.rs");
+include!("contract.rs");
+include!("scriptexec.rs");
 include!("action.rs");

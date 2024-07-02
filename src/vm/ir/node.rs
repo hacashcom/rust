@@ -39,14 +39,39 @@ impl IRNode for IRNodeParams {
     }
 }
 
+
 pub struct IRNodeExtAction {
+    pub inst: Bytecode,
+    pub kind: u16,
+    // maybe no body
+    pub body: Option<Box<dyn IRNode>>,
+}
+
+
+impl IRNode for IRNodeExtAction {
+    fn bytecode(&self) -> u8 {
+        self.inst as u8
+    }
+    fn codegen(&self) -> Vec<u8> {
+        let mut codes = match &self.body {
+            Some(bd) => bd.codegen(), // body
+            None => vec![],
+        };
+        let mut kindbts = self.kind.to_be_bytes().to_vec();
+        codes.append( &mut kindbts );
+        codes
+    }
+}
+
+/*
+pub struct IRNodeExtActionStatic {
     pub inst: Bytecode,
     pub kind: u16,
     pub body: Vec<u8>,
 }
 
 
-impl IRNode for IRNodeExtAction {
+impl IRNode for IRNodeExtActionStatic {
     fn bytecode(&self) -> u8 {
         self.inst as u8
     }
@@ -69,7 +94,7 @@ impl IRNode for IRNodeExtAction {
             codes.push(Bytecode::PUSHBUFL as u8); // push buf long
             codes.append(&mut (bdlen as u16 - 1).to_be_bytes().to_vec());
         } else {
-            panic!("{}", "IRNodeExtAction codegen: ext action length too long")
+            panic!("{}", "IRNodeExtActionStatic codegen: ext action length too long")
         }
         codes.append( &mut bdbts );
         let mut kindbts = self.kind.to_be_bytes().to_vec();
@@ -77,7 +102,7 @@ impl IRNode for IRNodeExtAction {
         return codes
     }
 }
-
+*/
 
 /*************************************/
 

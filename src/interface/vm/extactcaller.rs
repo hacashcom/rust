@@ -1,7 +1,7 @@
 
 pub trait ExtActCaller {
-    fn cutout(&self, _: &[u8]) -> Result<Vec<u8>, Error>;
-    fn call(&self, kind: u16, _: &[u8]) -> Result<(i64, Vec<u8>), Error>;
+    // fn cutout(&self, _: &[u8]) -> Result<Vec<u8>, Error>;
+    fn call(&self, kind: u16, body: &[u8]) -> Result<(i64, Vec<u8>), Error>;
 }
 
 

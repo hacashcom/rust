@@ -7,7 +7,7 @@
         diamond  : DiamondName
         to       : Address
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     6 + 21, // gas
     (self, env, state, store), // params
     false, // burn 90
@@ -42,7 +42,7 @@ fn diamond_transfer(this: &DiamondTransfer, env: &dyn ExecEnv, sta: &mut dyn Sta
         to             : Address 
         diamonds       : DiamondNameListMax200 
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21+21, // gas
     (self, env, state, store), // params
     false, // burn 90
@@ -81,7 +81,7 @@ fn diamond_from_to_transfer(this: &DiamondFromToTransfer, env: &dyn ExecEnv, sta
         to             : Address 
         diamonds       : DiamondNameListMax200 
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21, // gas
     (self, env, state, store), // params
     false, // burn 90

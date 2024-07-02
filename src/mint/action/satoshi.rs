@@ -7,7 +7,7 @@
         to       : Address
         satoshi  : Satoshi
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21 + 8, // gas
     (self, env, state, store), // params
     false, // burn 90
@@ -32,7 +32,7 @@
         to       : Address 
         satoshi  : Satoshi
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21 + 21 + 8, // gas
     (self, env, state, store), // params
     false, // burn 90
@@ -54,7 +54,7 @@
         from     : Address 
         satoshi  : Satoshi
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21 + 8, // gas
     (self, env, state, store), // params
     false, // burn 90

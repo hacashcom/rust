@@ -7,7 +7,7 @@ ActionDefine!{
         to : Address
         amt : Amount
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21 + 11, // gas = 32
     (self, env, state, store), // params
     false, // burn 90
@@ -29,7 +29,7 @@ ActionDefine!{
         from : Address
         amt : Amount
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21 + 11, // gas = 32
     (self, env, state, store), // params
     false, // burn 90
@@ -52,7 +52,7 @@ ActionDefine!{
         to : Address
         amt : Amount
     ),
-    ACTLV_TOP, // level
+    ACTLV_MAIN, // level
     21 + 21 + 11, // gas = 32
     (self, env, state, store), // params
     false, // burn 90

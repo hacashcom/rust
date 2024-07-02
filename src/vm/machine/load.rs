@@ -36,9 +36,8 @@ impl Machine {
     fn load_codes_by_syscall(&mut self, taradr: &ContractAddress, syscall: SystemCallType) 
         -> VmrtRes<Vec<u8>>
     {
-        let extact = self.extn_caller.clone();
         let target_contract = self.load_contract(taradr)?;
-        target_contract.load_syscall(syscall, extact.as_ref())
+        target_contract.load_syscall(syscall)
     }
 
 
@@ -85,9 +84,8 @@ impl Machine {
             return itr_err_code!(ContractError)
         }
         // read func
-        let extact = self.extn_caller.clone();
         let target_contract = self.load_contract(&target_addr)?;
-        let resfn = target_contract.load_usrfunc(&fnsign, extact.as_ref())?;
+        let resfn = target_contract.load_usrfunc(&fnsign)?;
         Ok((target_addr, resfn))
     }
 
