@@ -31,17 +31,6 @@ impl Field for ASTLeaf {
     
 }
 
-/*
-impl VMAction for ASTLeaf {
-    fn code(&self) -> u8 {
-        self.code
-    }
-
-    // fn build(&mut self, _: &dyn ExtActCaller, buf: &[u8]) -> Result<usize, Error> {
-    //     self.parse(buf, 0)
-    // }
-}
-*/
 
 impl ASTLeaf {
 

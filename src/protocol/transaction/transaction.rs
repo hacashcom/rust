@@ -1,7 +1,7 @@
 // Action list
 StructFieldDynList!{
-    DynListVMAction, 
-    Uint2, VMAction, vm::action::create
+    DynListAction, 
+    Uint2, Action, vm::action::create
 }
 
 

@@ -14,7 +14,7 @@ pub trait TransactionRead : Field + Send + Sync + dyn_clone::DynClone {
     fn message(&self) -> &StringTrim16 { panic_never_call_this!() }
     
     fn action_count(&self) -> u16 { panic_never_call_this!() }
-    fn actions(&self) -> &Vec<Box<dyn VMAction>> { panic_never_call_this!(); }
+    fn actions(&self) -> &Vec<Box<dyn Action>> { panic_never_call_this!(); }
 
     fn signs(&self) -> &Vec<Sign> { panic_never_call_this!(); }
     
@@ -32,7 +32,7 @@ pub trait Transaction : TransactionRead + TxExec + Send + Sync {
     // fn verify_all_need_signs(&self) -> Option<Error> { panic_never_call_this!() }
     // fn verify_target_signs(&self, _: &HashSet<Address>) -> Option<Error> { panic_never_call_this!() }
     fn fill_sign(&mut self,_: &Account) -> RetErr { panic_never_call_this!() }
-    fn push_action(&mut self, _: Box<dyn VMAction>) -> RetErr { panic_never_call_this!() }
+    fn push_action(&mut self, _: Box<dyn Action>) -> RetErr { panic_never_call_this!() }
 
 }
 

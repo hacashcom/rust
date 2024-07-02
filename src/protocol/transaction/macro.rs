@@ -42,7 +42,7 @@ StructFieldStruct!{ $class,
 	timestamp : Timestamp
 	address   : Address
 	fee       : Amount
-    actions   : DynListVMAction
+    actions   : DynListAction
     signs     : SignListW2
 	ano_mark  : Uint2
 }
@@ -55,7 +55,7 @@ impl $class {
             timestamp: Timestamp::from(curtimes()),
             address: addr,
             fee: fee,
-            actions: DynListVMAction::default(),
+            actions: DynListAction::default(),
             signs: SignListW2::default(),
             ano_mark: Uint2::default(),
         }
@@ -103,7 +103,7 @@ impl TransactionRead for $class {
     fn action_count(&self) -> u16 {
         self.actions.count().to_u64() as u16
     }
-    fn actions(&self) -> &Vec<Box<dyn VMAction>> {
+    fn actions(&self) -> &Vec<Box<dyn Action>> {
         self.actions.list()
     }
 
@@ -114,7 +114,7 @@ impl TransactionRead for $class {
     // burn_90_percent_fee
     fn burn_90(&self) -> bool {
         for act in self.actions() {
-            if act.as_ext().burn_90() {
+            if act.burn_90() {
                 return true // burn
             }
         }
@@ -133,7 +133,7 @@ impl TransactionRead for $class {
     fn req_sign(&self) -> HashSet<Address> {
         let mut addrs = HashSet::from([self.address().clone()]);
         for act in self.actions() {
-            for adr in act.as_ext().req_sign() {
+            for adr in act.req_sign() {
                 addrs.insert(adr);
             }
         }
@@ -176,7 +176,7 @@ impl Transaction for $class {
         self.signs.as_mut()[istid] = signobj;
         Ok(())
     }
-    fn push_action(&mut self, act: Box<dyn VMAction>) -> RetErr {
+    fn push_action(&mut self, act: Box<dyn Action>) -> RetErr {
         self.actions.push(act)
     }
 

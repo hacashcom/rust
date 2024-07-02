@@ -5,13 +5,6 @@ pub struct ASTExtWrap {
     body: Vec<u8>,
 }
 
-/*
-impl VMAction for ASTExtWrap {
-    // fn body(&self) -> &[u8] { 
-    //     &self.body
-    // }
-}
-*/
 
 impl Serialize for ASTExtWrap {
     fn serialize(&self) -> Vec<u8> {

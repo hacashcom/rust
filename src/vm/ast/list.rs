@@ -1,7 +1,7 @@
 
 pub struct ASTList {
     count: Uint2,
-    lists: Vec<Box<dyn VMAction>>,
+    lists: Vec<Box<dyn Action>>,
 }
 
 /* */

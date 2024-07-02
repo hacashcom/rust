@@ -46,11 +46,6 @@ macro_rules! pubFnRegActionCreates {
         pubFnRegActionCreateCommonEx!{
             try_create, create, Action, $($ty)+
         }
-
-        pubFnRegActionCreateCommonEx!{
-            try_create_vm, create_vm, VMAction, $($ty)+
-        }
-
     }
 }
 
@@ -71,29 +66,13 @@ pub const ACTION_KIND_ID: u16 = $actid;
 });
 
 
-impl VMAction for $actname {
+impl Action for $actname {
     fn kind(&self) -> u16 {
         $actid
     }
-    fn gas(&self) -> i32 {
+    fn gas(&self) -> i64 {
         $gas
     }
-    fn as_vm(&self) -> &dyn VMAction {
-        self
-    }
-    fn as_ext(&self) -> &dyn Action {
-        self
-    }
-}
-
-impl ActExec for $actname {
-    fn execute(&$p_self, $p_env: &dyn ExecEnv, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
-        $exec
-    }
-}
-
-
-impl Action for $actname {
     fn level(&self) -> u8 {
         $lv
     }
@@ -104,6 +83,13 @@ impl Action for $actname {
         HashSet::from($reqsign)
     }
 }
+
+impl ActExec for $actname {
+    fn execute(&$p_self, $p_env: &dyn ExecEnv, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
+        $exec
+    }
+}
+
 
 impl $actname {
 

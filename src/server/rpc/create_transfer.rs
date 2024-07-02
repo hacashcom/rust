@@ -53,7 +53,7 @@ async fn create_coin_transfer(State(ctx): State<ApiCtx>, q: Query<Q9374>) -> imp
     // append actions
     // sat
     if satoshi > 0 {
-        let mut act: Box<dyn VMAction>;
+        let mut act: Box<dyn Action>;
         let sat = Satoshi::from(satoshi);
         if is_from {
             let mut obj = SatoshiFromToTransfer::default();
@@ -71,7 +71,7 @@ async fn create_coin_transfer(State(ctx): State<ApiCtx>, q: Query<Q9374>) -> imp
     }
     // hacd
     if diamonds.len() >= DiamondName::width() {
-        let mut act: Box<dyn VMAction>;
+        let mut act: Box<dyn Action>;
         let dialist = DiamondNameListMax200::from_string(&diamonds);
         if let Err(e) = dialist {
             return api_error(&format!("diamonds error: {}", &e))
@@ -100,7 +100,7 @@ async fn create_coin_transfer(State(ctx): State<ApiCtx>, q: Query<Q9374>) -> imp
     }
     // hac
     if hacash.len() > 0 {
-        let mut act: Box<dyn VMAction>;
+        let mut act: Box<dyn Action>;
         let hac = Amount::from_string_unsafe(&hacash);
         if let Err(e) = hac {
             return api_error(&format!("hacash amount {} error: {}", &hacash, &e))

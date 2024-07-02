@@ -186,8 +186,8 @@ impl IRNode for IRNodeBlock {
             codes.append( &mut sub.codegen() );
             codes.push(POP as u8); // pop
         }
-        if codes.len() > 0 {
-            codes.pop(); // drop tail pop
+        if self.subs.len() > 0 {
+            codes.pop(); // drop tail pop be value
         }
         return codes
     }

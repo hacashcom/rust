@@ -1,9 +1,9 @@
 
 
 /**
- * create vm action
+ * create action
  */
-pub fn create(buf: &[u8]) -> Ret<(Box<dyn VMAction>, usize)> {
+pub fn create(buf: &[u8]) -> Ret<(Box<dyn Action>, usize)> {
     // println!("create vm action {}", hex::encode(buf));
     let cds = buf_clip_mvsk!(buf, 1);
     let code = cds[0] as u8;
@@ -13,12 +13,12 @@ pub fn create(buf: &[u8]) -> Ret<(Box<dyn VMAction>, usize)> {
     // try extend actions
     let kid = protocol::action::cut_kind(buf)?;
     // core
-    let extactobj1 = protocol::action::try_create_vm(kid, buf)?;
+    let extactobj1 = protocol::action::try_create(kid, buf)?;
     if let Some(res) = extactobj1 {
         return Ok(res)
     }
     // mint
-    let mut extactobj2 = mint::action::try_create_vm(kid, buf)?;
+    let mut extactobj2 = mint::action::try_create(kid, buf)?;
     if let Some(res) = extactobj2 {
         return Ok(res)
     }
