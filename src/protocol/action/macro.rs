@@ -1,3 +1,29 @@
+use lazy_static::lazy_static;
+
+
+pub type ExtendActionsTryCreateFunc= fn(u16, &[u8]) -> Ret<Option<(Box<dyn Action>, usize)>>;
+
+pub static mut EXTEND_ACTIONS_TRY_CREATE_FUNC: Option<ExtendActionsTryCreateFunc> = None;
+
+
+pub fn create(buf: &[u8]) -> Ret<(Box<dyn Action>, usize)> {
+
+    let kid = cut_kind(buf)?;
+    let mut hasact = try_create(kid, buf)?;
+    if let None = hasact {
+        unsafe{
+        if let Some(func) = EXTEND_ACTIONS_TRY_CREATE_FUNC {
+            hasact = func(kid, buf)?;
+        }
+        }
+    }
+    match hasact {
+        Some(res) => Ok(res),
+        None => Err(format!("Action Kind <{}> not find.", kid))
+    }
+
+}
+
 
 
 /******* pubFnRegActions ********/
@@ -16,15 +42,6 @@ macro_rules! pubFnRegActionCreateCommonEx {
             Ok(None)
         }
 
-        pub fn $createfn(buf: &[u8]) -> Ret<(Box<dyn $retty>, usize)> {
-            let kid = cut_kind(buf)?;
-            let hasact = $trycreatefn(kid, buf)?;
-            match hasact {
-                Some(res) => Ok(res),
-                None => Err(format!("Action Kind <{}> not find.", kid))
-            }
-        }
-
     }
 }
 
@@ -32,7 +49,6 @@ macro_rules! pubFnRegActionCreateCommonEx {
 /******* Create Func Define ********/
 
 
-#[macro_export]
 macro_rules! pubFnRegActionCreates {
     ( $($ty:ident)+ ) => {
 
@@ -46,6 +62,16 @@ macro_rules! pubFnRegActionCreates {
         pubFnRegActionCreateCommonEx!{
             try_create, create, Action, $($ty)+
         }
+    }
+}
+
+
+#[macro_export]
+macro_rules! pubFnRegExtendActionCreates {
+    ( $($ty:ident)+ ) => {
+        pubFnRegActionCreates!{ $($ty)+ }
+
+
     }
 }
 

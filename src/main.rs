@@ -61,7 +61,7 @@ fn main() {
 
     // main_test8327459283();
     // main_test_vecspeed387425983();
-    return main_vm_machine_call("56");
+    // return main_vm_machine_call("56");
     
 
     let inicnf = config::load_config();
@@ -78,6 +78,8 @@ fn main() {
 fn start_hacash_node(iniobj: sys::IniObj) {
     // println!("startHacashNode ini={:?}", iniobj);
     // mint
+    crate::mint::action::init_reg();
+
     let mint_checker = Box::new(BlockMintChecker::new(&iniobj));
 
     // engine

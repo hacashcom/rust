@@ -15,3 +15,4 @@ pub fn exec_tx_actions(is_fast_sync: bool, pending_height: u64, pending_hash: Ha
     // ok
     Ok(())
 }
+
