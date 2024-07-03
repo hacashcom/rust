@@ -47,6 +47,13 @@ pub enum ItrErrCode {
 #[derive(Debug)]
 pub struct ItrErr(pub ItrErrCode, pub String);
 
+impl ToString for ItrErr {
+    fn to_string(&self) -> String {
+        format!("{:?}: {}", self.0, self.1)
+    }
+}
+
+
 impl ItrErr {
     pub fn new(n: ItrErrCode, tip: &str) -> ItrErr {
         ItrErr(n, tip.to_string())

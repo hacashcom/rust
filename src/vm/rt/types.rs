@@ -16,6 +16,13 @@ pub fn address_to_contract(adr: &Address) -> ContractAddress {
 pub type FnSign = [u8; FN_SIGN_WIDTH];
 
 
+macro_rules! unsafe_std_mem_transmute  {
+    ($v: expr) => { 
+        unsafe { std::mem::transmute($v) }
+    }
+}
+
+
 //////////////////////////////////////////
 
 /*

@@ -22,6 +22,11 @@ pub mod machine;
 
 
 
+
+
+
+/*
+
 pub struct HacashVM {
     store: Arc<dyn Store>,
 }
@@ -66,3 +71,6 @@ fn do_exec(env: &dyn ExecEnv, bst: &mut dyn State, sto: &dyn Store, actlist: &Ve
     // ok finish
     Ok(())
 }
+
+
+*/

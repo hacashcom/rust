@@ -10,7 +10,7 @@ macro_rules! impl_contract_function {
         impl ContractFunction for $class {
             fn code_type(&self) -> CodeType {
                 let ct = self.vrsn[0] & 0b00000011;
-                unsafe { std::mem::transmute(ct) }
+                unsafe_std_mem_transmute!(ct)
             }
             fn code_data(&self) -> &[u8] {
                 self.code.as_ref()

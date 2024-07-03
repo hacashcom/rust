@@ -2,6 +2,7 @@
 use std::sync::{ Arc };
 use std::collections::{ HashMap };
 
+use crate::sys::*;
 use crate::core::field::*;
 use crate::interface::field::*;
 use crate::interface::ir::*;

@@ -17,6 +17,10 @@
     true, // burn 90
     [], // req sign
     { 
+        let addr = Fixed21{ bytes: [0u8; 21] };
+        let codes = [74u8,89];
+        env.vm_main_call(&addr, &codes);
+        
         ActExecRes::wrap(Ok(()))
     }
 }

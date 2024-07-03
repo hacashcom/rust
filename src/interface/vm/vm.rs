@@ -6,3 +6,8 @@ pub trait VM: Send + Sync {
 }
 
 
+pub trait VMIvk {
+    fn main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> { panic_never_call_this!() }
+    fn sytm_call(&mut self, entry: &Address, fnty: u8, input: Vec<u8>) -> Ret<Vec<u8>> { panic_never_call_this!() }
+}
+

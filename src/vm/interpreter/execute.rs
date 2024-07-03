@@ -207,7 +207,7 @@ pub fn execute_code(
         // read inst
         let instbyte = codes[*pc as usize]; // u8
         let instu8 = instbyte.clone(); // u8
-        let instruction: Bytecode = unsafe { std::mem::transmute(instu8) }; // u8
+        let instruction: Bytecode = unsafe_std_mem_transmute!(instu8); // u8
         *pc += 1; // next
 
         // do execute

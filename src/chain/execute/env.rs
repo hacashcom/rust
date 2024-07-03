@@ -5,6 +5,7 @@ pub struct ExecEnvObj<'a> {
     pdhash: Hash,
     mainaddr: Address,
     tx: &'a dyn TransactionRead,
+    vmobj: Option<Box<dyn VMIvk>>,
 }
 
 
@@ -16,6 +17,7 @@ impl ExecEnvObj<'_> {
             pdhash: Hash::default(),
             mainaddr: tx.address().clone(),
             tx: tx,
+            vmobj: None,
         }
     }
 }
@@ -43,5 +45,17 @@ impl ExecEnv for ExecEnvObj<'_> {
     }
     fn fast_sync(&self) -> bool {
         self.fastsync
+    }
+    fn vm_main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> {
+        if let None = self.vmobj {
+            let gas = 1000000i64;
+            let extcaller = vm::interpreter::TestExtActCaller::new();
+            let outstorer = vm::interpreter::TestOutStorager::new();
+            self.vmobj = Some(Box::new(vm::machine::Machine::new(
+                gas, Arc::new(extcaller), Arc::new(outstorer)
+            )));
+        }
+        // call
+        self.vmobj.as_mut().unwrap().main_call(entry, irs)
     }
 }

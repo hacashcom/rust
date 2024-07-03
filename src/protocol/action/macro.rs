@@ -111,7 +111,7 @@ impl Action for $actname {
 }
 
 impl ActExec for $actname {
-    fn execute(&$p_self, $p_env: &dyn ExecEnv, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
+    fn execute(&$p_self, $p_env: &mut dyn ExecEnv, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
         $exec
     }
 }

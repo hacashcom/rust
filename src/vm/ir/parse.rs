@@ -65,7 +65,7 @@ pub fn parse_ir_node_must(stuff: &[u8], seek: &mut usize) -> VmrtRes<Box<dyn IRN
     
     // code
     let insbyte = stuff[*seek];// u8
-    let inst: Bytecode = unsafe { std::mem::transmute(insbyte) };
+    let inst: Bytecode = unsafe_std_mem_transmute!(insbyte);
     // parse
     let mut irnode: Box<dyn IRNode>;
     // mv sk

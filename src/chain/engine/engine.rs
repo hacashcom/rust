@@ -28,7 +28,6 @@ pub struct BlockEngine {
     klctx: Mutex<BlockRoller>, // change
 
     mintk: Box<dyn MintChecker>,
-    vmobj: Box<dyn VM>,
     // actns: Box<dyn >,
 
     // insert lock
@@ -52,13 +51,10 @@ impl BlockEngine {
         let bsblk = load_base_block(mintk.as_ref(), &stoldb);
         let roller = BlockRoller::create(bsblk, staptr);
         let stoptr = Arc::new(stoldb);
-        // vm
-        let vmobj = vm::HacashVM::new(ini, stoptr.clone());
         // engine
         let mut engine = BlockEngine {
             cnf: cnf,
             store: stoptr.clone(),
-            vmobj: Box::new(vmobj),
             klctx: Mutex::new(roller),
             mintk: mintk,
             isrlck: Mutex::new(true),
@@ -100,7 +96,7 @@ impl BlockEngine {
         let height = self.get_latest_height().uint() + 1; // next height
         let blkhash = Hash::cons([0u8; 32]); // empty hash
         // exec
-        exec_tx_actions(false, height, blkhash, self.vmobj.as_ref(), &mut sub_state, tx.as_read())?;
+        exec_tx_actions(false, height, blkhash, &mut sub_state, self.store.as_ref(), tx.as_read())?;
         tx.execute(height, &mut sub_state)
     } 
 

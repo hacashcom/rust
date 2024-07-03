@@ -1,20 +1,30 @@
 
 
+impl VMIvk for Machine {
+    
+    fn main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> {
+        Ok(self.do_main_call(entry, irs).map_err(|e|e.to_string())?.cast_to_buf())
+    }
+
+    fn sytm_call(&mut self, entry: &Address, fnidx: u8, input: Vec<u8>) -> Ret<Vec<u8>> {
+        let fnty: SystemCallType = unsafe_std_mem_transmute!(fnidx);
+        Ok(self.do_sys_call(entry, fnty, input).map_err(|e|e.to_string())?.cast_to_buf())
+    }
+
+}
+
+
 impl Machine {
 
 
-    pub fn main_call(&mut self, entry: &Address, irs: &[u8]) -> VmrtRes<StackItem> {
+    pub fn do_main_call(&mut self, entry: &Address, irs: &[u8]) -> VmrtRes<StackItem> {
         // parse
-        let count = u16::from_be_bytes(irs[0..2].try_into().unwrap());
-        let codes = parse_ir_list(
-            count as usize,
-            &irs[2..],
-        )?.codegen();
+        let codes = parse_ir_block(irs, &mut 0)?.codegen();
         let entry = address_to_contract(entry);
         self.do_call(entry, codes, StackItem::nil(), false)
     }
 
-    pub fn sys_call(&mut self, entry: &Address, fnty: SystemCallType, input: Vec<u8>) -> VmrtRes<StackItem> {
+    pub fn do_sys_call(&mut self, entry: &Address, fnty: SystemCallType, input: Vec<u8>) -> VmrtRes<StackItem> {
         let entry = address_to_contract(entry);
         let codes = self.load_codes_by_syscall(&entry, fnty)?;
         self.do_call(entry, codes, StackItem::buf(input), true)
