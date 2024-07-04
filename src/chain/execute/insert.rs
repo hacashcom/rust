@@ -121,9 +121,9 @@ pub fn do_check_insert(
     }
     // add miner got fee
     if alltxfee.is_positive() { // amt > 0
-        let miner = coinbase_tx.address();
+        let miner = coinbase_tx.address().unwrap();
         let mut corestate = CoreState::wrap(&mut sub_state);
-        operate::hac_add(&mut corestate, miner, &alltxfee)?;
+        operate::hac_add(&mut corestate, &miner, &alltxfee)?;
     }
     // test
     Ok(sub_state)

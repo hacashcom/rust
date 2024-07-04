@@ -14,16 +14,16 @@
     ),
     ACTLV_TOP_ONLY, // level
     16 + (21+11)*2, // gas
-    (self, env, state, store), // params
+    (self, ctx, state, store, gas), // params
     false, // burn 90
     [
-        self.left_bill.address,
-        self.right_bill.address
+        AddrOrPtr::by_addr(self.left_bill.address),
+        AddrOrPtr::by_addr(self.right_bill.address)
     ], // req sign
-    ActExecRes::wrap(channel_open(self, env, state, store))
+    channel_open(self, ctx, state, store)
 }
 
-fn channel_open(this: &ChannelOpen, env: &dyn ExecEnv, sta: &mut dyn State, sto: &dyn Store) -> RetErr {
+fn channel_open(this: &ChannelOpen, ctx: &dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
 
     let (cid, left_addr, left_amt, right_addr, right_amt ) = (
         &this.channel_id,
@@ -79,7 +79,7 @@ fn channel_open(this: &ChannelOpen, env: &dyn ExecEnv, sta: &mut dyn State, sto:
     }
 
     // save channel
-    let pd_hei = env.pending_height();
+    let pd_hei = ctx.pending_height();
     let channel = ChannelSto{
         status: CHANNEL_STATUS_OPENING,
         reuse_version: reuse_version,
@@ -104,7 +104,7 @@ fn channel_open(this: &ChannelOpen, env: &dyn ExecEnv, sta: &mut dyn State, sto:
     state.set_total_count(&ttcount);
 
     // ok finish
-    Ok(())
+    Ok(vec![])
 }
 
 
@@ -120,13 +120,13 @@ fn channel_open(this: &ChannelOpen, env: &dyn ExecEnv, sta: &mut dyn State, sto:
     ),
     ACTLV_TOP_ONLY, // level
     16, // gas
-    (self, env, state, store), // params
+    (self, ctx, state, store, gas), // params
     false, // burn 90
     [], // req sign
-    ActExecRes::wrap(channel_close(self, env, state, store))
+    channel_close(self, ctx, state, store)
 }
 
-fn channel_close(this: &ChannelClose, env: &dyn ExecEnv, sta: &mut dyn State, sto: &dyn Store) -> RetErr {
+fn channel_close(this: &ChannelClose, ctx: &dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
 
     let mut state = MintState::wrap(sta);
 
@@ -135,9 +135,9 @@ fn channel_close(this: &ChannelClose, env: &dyn ExecEnv, sta: &mut dyn State, st
     // query
     let chan = must_have!("channel", state.channel(cid));
 	// verify two address sign
-    env.check_signature( &chan.left_bill.address )?;
-    env.check_signature( &chan.right_bill.address )?;
+    ctx.check_signature( &chan.left_bill.address )?;
+    ctx.check_signature( &chan.right_bill.address )?;
     drop(state);
     // do close
-    close_channel_default( env.pending_height(), sta, cid, &chan)
+    close_channel_default( ctx.pending_height(), sta, cid, &chan)
 }

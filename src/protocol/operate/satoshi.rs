@@ -44,14 +44,14 @@ fnSatoshiOperateCommon!(sat_sub, addr, sat, oldsat, {
 /**************************** */
 
 
-pub fn sat_transfer(state: &mut CoreState, addr_from: &Address, addr_to: &Address, sat: &Satoshi) -> RetErr {
+pub fn sat_transfer(state: &mut CoreState, addr_from: &Address, addr_to: &Address, sat: &Satoshi) -> Ret<Vec<u8>> {
     if addr_from == addr_to {
 		return errf!("cannot trs to self")
     }
     sat_sub(state, addr_from, sat)?;
     sat_add(state, addr_to, sat)?;
     // ok
-    Ok(())
+    Ok(vec![])
 }
 
 

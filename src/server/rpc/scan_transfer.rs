@@ -35,7 +35,7 @@ async fn scan_coin_transfer(State(ctx): State<ApiCtx>, q: Query<Q4538>) -> impl 
         "block_hash", blkobj.hash().hex(),
         "tx_timestamp", tartrs.timestamp().uint(),
         "block_timestamp", blkobj.timestamp().uint(),
-        "address", tartrs.address().readable(),
+        "address", tartrs.address().unwrap().readable(),
         "transfers", dtlist,
     };
     api_data(data)

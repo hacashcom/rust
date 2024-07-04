@@ -94,10 +94,10 @@ ActionDefineWithStruct!{
     DiamondMint : 4,
     ACTLV_TOP_ONLY, // level
     6 + 3 + 32 + 8 + 21 + 32, // gas
-    (self, env, state, store), // params
+    (self, ctx, state, store, gas), // params
     { self.head.number.to_u32() > DIAMOND_ABOVE_NUMBER_OF_BURNING90_PERCENT_TX_FEES }, // burn 90
     [], // req sign
-    ActExecRes::wrap(diamond_mint(self, env, state, store))
+    diamond_mint(self, ctx, state, store)
 }
 
 
@@ -105,13 +105,13 @@ ActionDefineWithStruct!{
 /**
  * DiamondMint Exec
  */
-fn diamond_mint(this: &DiamondMint, env: &dyn ExecEnv, sta: &mut dyn State, sto: &dyn Store) -> RetErr {
+fn diamond_mint(this: &DiamondMint, ctx: &dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
 
     let mut state = MintState::wrap(sta);
     let store = MintStoreDisk::wrap(sto);
 
-    let pending_height = env.pending_height();
-    let pending_hash = env.pending_hash();
+    let pending_height = ctx.pending_height();
+    let pending_hash = ctx.pending_hash();
 
     let number = this.head.number;
     let dianum = number.to_u32();
@@ -127,7 +127,7 @@ fn diamond_mint(this: &DiamondMint, env: &dyn ExecEnv, sta: &mut dyn State, sto:
     // check mine
     let (sha3hx, mediumhx, diahx) = x16rs::mine_diamond(dianum, &prev_hash, &nonce, &address, &custom_message);
 
-    let not_fast_sync = false == env.fast_sync();
+    let not_fast_sync = false == ctx.fast_sync();
     if not_fast_sync {
 
         // check
@@ -181,7 +181,7 @@ fn diamond_mint(this: &DiamondMint, env: &dyn ExecEnv, sta: &mut dyn State, sto:
     }
 
     // tx fee
-    let tx_bid_fee = env.tx_fee();
+    let tx_bid_fee = ctx.tx_fee();
 
     // total count 
     let mut ttcount = state.total_count();
@@ -238,11 +238,8 @@ fn diamond_mint(this: &DiamondMint, env: &dyn ExecEnv, sta: &mut dyn State, sto:
     let mut core_state = CoreState::wrap(sta);
     hacd_add(&mut core_state, &this.head.address, &DiamondNumber::from(1))?;
 
-
-
-
     // ok
-    Ok(())
+    Ok(vec![])
 }
 
 

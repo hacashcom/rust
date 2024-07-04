@@ -15,15 +15,30 @@ impl ExecEnvObj<'_> {
             fastsync: false,
             pdhei: pdhei,
             pdhash: Hash::default(),
-            mainaddr: tx.address().clone(),
+            mainaddr: tx.address().unwrap(),
             tx: tx,
             vmobj: None,
         }
     }
+
+    fn create_vm(&self) -> vm::machine::Machine {
+
+        let fee_zhu = self.tx_fee().to_zhu_unsafe() as i64;
+        let txsz = self.tx.size() as i64;
+        let gas_price = fee_zhu / txsz;
+
+        let gas = 1000000i64;
+        let extcaller = vm::interpreter::TestExtActCaller::new();
+        let outstorer = vm::interpreter::TestOutStorager::new();
+        vm::machine::Machine::new(
+            gas, Arc::new(extcaller), Arc::new(outstorer)
+        )
+    }
+
 }
 
 
-impl ExecEnv for ExecEnvObj<'_> {
+impl ExecContext for ExecEnvObj<'_> {
 
     fn pending_height(&self) -> u64 {
         self.pdhei
@@ -37,6 +52,9 @@ impl ExecEnv for ExecEnvObj<'_> {
     fn main_address(&self) -> &Address {
         &self.mainaddr
     }
+    fn addr_list(&self) -> &AddrOrList {
+        &self.tx.addrlist()
+    }
     fn check_signature(&self, adr: &Address) -> RetErr {
         transaction::verify_target_signature(adr, self.tx)
     }
@@ -46,16 +64,11 @@ impl ExecEnv for ExecEnvObj<'_> {
     fn fast_sync(&self) -> bool {
         self.fastsync
     }
-    fn vm_main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> {
+    fn vm(&mut self) -> &mut dyn VMIvk {
         if let None = self.vmobj {
-            let gas = 1000000i64;
-            let extcaller = vm::interpreter::TestExtActCaller::new();
-            let outstorer = vm::interpreter::TestOutStorager::new();
-            self.vmobj = Some(Box::new(vm::machine::Machine::new(
-                gas, Arc::new(extcaller), Arc::new(outstorer)
-            )));
+            let vm = self.create_vm();
+            self.vmobj = Some(Box::new(vm));
         }
-        // call
-        self.vmobj.as_mut().unwrap().main_call(entry, irs)
+        self.vmobj.as_mut().unwrap().as_mut()
     }
 }

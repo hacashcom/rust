@@ -6,6 +6,13 @@ fn tdat() -> Box<dyn Action> {
     Box::new(obj)
 }
 
+pub fn main_test28374659823746892() {
+
+    for i in 0..=255u32 {
+        println!("{}: {}", i, i.pow(3)  )
+    }
+
+}
 
 pub fn main_test736428456983476824() {
 
@@ -127,7 +134,7 @@ pub fn main_test_vecspeed387425983() {
     let end_time = Instant::now();
 
     let elapsed_time = end_time - start_time;
-    println!("代码运行时间: {:?}", elapsed_time);
+    println!("code run time: {:?}", elapsed_time);
 
     // println!("vec len {} {} ", datas.len(), hex::encode(datas[0].serialize()));
     println!("vec len {}", datas.len());

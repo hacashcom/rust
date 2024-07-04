@@ -13,15 +13,13 @@
     ),
     ACTLV_TOP, // level
     11, // gas = 32
-    (self, env, state, store), // params
+    (self, ctx, state, store, gas), // params
     true, // burn 90
     [], // req sign
     { 
         let addr = Fixed21{ bytes: [0u8; 21] };
         let codes = [74u8,89];
-        env.vm_main_call(&addr, &codes);
-        
-        ActExecRes::wrap(Ok(()))
+        ctx.vm().main_call(&addr, &codes)
     }
 }
 

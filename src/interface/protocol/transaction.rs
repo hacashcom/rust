@@ -6,7 +6,8 @@ pub trait TransactionRead : Field + Send + Sync + dyn_clone::DynClone {
 
     fn ty(&self) -> u8 { panic_never_call_this!() }
 
-    fn address(&self) -> &Address { panic_never_call_this!() }
+    fn address(&self) -> Ret<Address> { panic_never_call_this!() }
+    fn addrlist(&self) -> &AddrOrList{ panic_never_call_this!() }
     fn fee(&self) -> &Amount { panic_never_call_this!(); }
     fn timestamp(&self) -> &Timestamp { panic_never_call_this!() }
 
@@ -19,7 +20,7 @@ pub trait TransactionRead : Field + Send + Sync + dyn_clone::DynClone {
     fn signs(&self) -> &Vec<Sign> { panic_never_call_this!(); }
     
     // fn fee_purity(&self) -> u32 { 0 }
-    fn req_sign(&self) -> HashSet<Address> { panic_never_call_this!(); }
+    fn req_sign(&self) -> Ret<HashSet<Address>> { panic_never_call_this!(); }
     fn fee_got(&self) -> Amount { panic_never_call_this!(); } // fee_miner_received
     fn burn_90(&self) -> bool { panic_never_call_this!(); } // burn_90_percent_fee
 }

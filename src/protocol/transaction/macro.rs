@@ -38,13 +38,14 @@ macro_rules! DefineCommonTransaction {
 
 // Transaction Type 1 & 2
 StructFieldStruct!{ $class, 
-	ty        : Uint1
-	timestamp : Timestamp
-	address   : Address
-	fee       : Amount
-    actions   : DynListAction
-    signs     : SignListW2
-	ano_mark  : Uint2
+	ty         : Uint1
+	timestamp  : Timestamp
+	addrorlist : AddrOrList
+	fee        : Amount
+    actions    : DynListAction
+    signs      : SignListW2
+	gas_max    : Uint1
+	ano_mark   : Fixed1
 }
 
 impl $class {
@@ -53,11 +54,12 @@ impl $class {
         $class{
             ty: Uint1::from($tyid),
             timestamp: Timestamp::from(curtimes()),
-            address: addr,
+            addrorlist: AddrOrList::by_addr(addr),
             fee: fee,
             actions: DynListAction::default(),
             signs: SignListW2::default(),
-            ano_mark: Uint2::default(),
+	        gas_max : Uint1::default(),
+            ano_mark: Fixed1::default(),
         }
     }
 
@@ -65,7 +67,7 @@ impl $class {
         let stuff = vec![
             self.ty.serialize(),
             self.timestamp.serialize(),
-            self.address.serialize(),
+            self.addrorlist.serialize(),
             adfe, /* self.fee.serialize()*/
             self.actions.serialize()
         ].concat();
@@ -89,8 +91,11 @@ impl TransactionRead for $class {
         self.ty.to_u8()
     }
 
-    fn address(&self) -> &Address {
-        &self.address
+    fn address(&self) -> Ret<Address> {
+        self.addrorlist.main()
+    }
+    fn addrlist(&self) -> &AddrOrList{ 
+        &self.addrorlist
     }
     fn fee(&self) -> &Amount {
         &self.fee
@@ -130,14 +135,14 @@ impl TransactionRead for $class {
         gfee
     } 
 
-    fn req_sign(&self) -> HashSet<Address> {
-        let mut addrs = HashSet::from([self.address().clone()]);
+    fn req_sign(&self) -> Ret<HashSet<Address>> {
+        let mut addrs = HashSet::from([self.address()?]);
         for act in self.actions() {
             for adr in act.req_sign() {
-                addrs.insert(adr);
+                addrs.insert(adr.real(self.addrlist())?);
             }
         }
-        addrs
+        Ok(addrs)
     }
     
 }
@@ -148,7 +153,7 @@ impl Transaction for $class {
     }
     fn fill_sign(&mut self, acc: &Account) -> RetErr {
         let mut fhx = self.hash();
-        if acc.address() == self.address.as_bytes() {
+        if acc.address() == self.address()?.as_bytes() {
             fhx = self.hash_with_fee();
         }
         // do sign
@@ -212,10 +217,10 @@ impl TxExec for $class {
         exiobj.height = BlockHeight::from(blkhei);
         state.set_txexist(&txhx, &exiobj);
         // sub fee
-        let feeadr = self.address();
+        let feeadr = self.address()?;
         let amt = self.fee();    
         // println!("tx execute pay fee from {} amount {}", feeadr.readable(), amt.to_fin_string());
-        operate::hac_sub(&mut state, feeadr, amt)?;
+        operate::hac_sub(&mut state, &feeadr, amt)?;
         Ok(())
     }
 

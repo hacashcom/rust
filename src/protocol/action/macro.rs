@@ -82,8 +82,8 @@ macro_rules! pubFnRegExtendActionCreates {
 macro_rules! ActionDefineWithStruct {
     {   $actname:ident : $actid:expr, 
         $lv:expr, $gas:expr,
-        ($p_self:ident, $p_env:ident, $p_state:ident, $p_store:ident ), 
-        $burn90:expr, $reqsign:expr, $exec:expr 
+        ($p_self:ident, $p_env:ident, $p_state:ident, $p_store:ident, $p_gas:ident), 
+        $burn90:expr, $reqsign:expr, $execblock:expr 
     } => {
 
 // ACTION_KIND DEFINE
@@ -105,14 +105,17 @@ impl Action for $actname {
     fn burn_90(&$p_self) -> bool { 
         $burn90
     }
-    fn req_sign(&$p_self) -> HashSet<Address> {
-        HashSet::from($reqsign)
+    fn req_sign(&$p_self) -> Vec<AddrOrPtr> {
+        $reqsign.to_vec()
     }
 }
 
 impl ActExec for $actname {
-    fn execute(&$p_self, $p_env: &mut dyn ExecEnv, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
-        $exec
+    fn execute(&$p_self, $p_env: &mut dyn ExecContext, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
+        let mut $p_gas = $p_self.gas() as i64; // gas
+        let mut res = |$p_gas: &mut i64|->Ret<Vec<u8>>{ $execblock };
+        let v = res(&mut $p_gas);
+        ActExecRes::create($p_gas, v)
     }
 }
 
@@ -151,7 +154,7 @@ macro_rules! ActionDefine {
     {   $actname:ident : $actid:expr, 
         ($( $item:ident : $type:ty )*), 
         $lv:expr, $gas:expr,
-        ($p_self:ident, $p_env:ident, $p_state:ident, $p_store:ident ), 
+        ($p_self:ident, $p_env:ident, $p_state:ident, $p_store:ident, $p_gas:ident), 
         $burn90:expr, $reqsign:expr, $exec:expr 
     } => {
 
@@ -165,7 +168,7 @@ macro_rules! ActionDefine {
         ActionDefineWithStruct!{
             $actname : $actid, 
             $lv, $gas,
-            ($p_self, $p_env, $p_state, $p_store ), 
+            ($p_self, $p_env, $p_state, $p_store, $p_gas), 
             $burn90, $reqsign, $exec 
         }
 

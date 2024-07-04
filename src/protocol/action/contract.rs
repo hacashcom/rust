@@ -8,11 +8,11 @@
     ),
     ACTLV_TOP_ONLY, // level
     11, // gas = 32
-    (self, env, state, store), // params
+    (self, ctx, state, store, gas), // params
     true, // burn 90
     [], // req sign
     { 
-        ActExecRes::wrap(Ok(()))
+        Ok(vec![])
     }
 }
 
@@ -27,11 +27,11 @@
     ),
     ACTLV_TOP_ONLY, // level
     11, // gas = 32
-    (self, env, state, store), // params
+    (self, ctx, state, store, gas), // params
     true, // burn 90
     [], // req sign
-    { 
-        ActExecRes::wrap(Ok(()))
+    {
+        Ok(vec![])
     }
 }
 

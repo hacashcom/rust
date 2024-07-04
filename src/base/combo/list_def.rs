@@ -30,6 +30,13 @@ impl std::ops::IndexMut<usize> for $class {
     }
 }
 
+impl FieldReadable for $class {
+    fn readable(&self) -> String {
+        format!("[...]")
+    }
+}
+
+
 impl Parse for $class {
 
     fn parse(&mut self, buf: &[u8], seek: usize) -> Ret<usize> {

@@ -41,13 +41,13 @@ fnDiamondOperateCommon!(hacd_sub, addr, hacd, oldhacd, {
 /**************************** */
 
 
-pub fn hacd_transfer(state: &mut CoreState, addr_from: &Address, addr_to: &Address, hacd: &DiamondNumber) -> RetErr {
+pub fn hacd_transfer(state: &mut CoreState, addr_from: &Address, addr_to: &Address, hacd: &DiamondNumber) -> Ret<Vec<u8>> {
     if addr_from == addr_to {
 		return errf!("cannot transfer to self")
     }
     hacd_sub(state, addr_from, hacd)?;
     hacd_add(state, addr_to, hacd)?;
     // ok
-    Ok(())
+    Ok(vec![])
 }
 
