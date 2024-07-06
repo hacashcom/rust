@@ -170,7 +170,8 @@ pub fn execute_code(
     gas_table: &GasTable, // len = 256
     gas_extra: &GasExtra,
 
-    extactcaller: &dyn ExtActCaller,
+    extactcaller: &mut dyn ExtActCaller,
+    outstorager: &mut dyn OutStorager,
 
     locals: &mut Stack,
     operand_stack: &mut Stack,
@@ -214,12 +215,12 @@ pub fn execute_code(
         let mut gas_added = 0i64;
 
         macro_rules! extcall { ($ifv: expr) => { 
-            let mut bdv = vec![];
+            let mut actbody = vec![instbyte, pu8!()];
             if $ifv {
-                bdv = ops.peek()?.cast_to_buf();
+                let mut bdv = ops.peek()?.cast_to_buf();
+                actbody.append(&mut bdv);
             }
-            let kind = u16::from_be_bytes([instbyte, pu8!()]);
-            let (gasu, cres) = extactcaller.call(kind, &bdv).map_err(|e|
+            let (gasu, cres) = extactcaller.call(actbody).map_err(|e|
                 ItrErr::new(ExtActCallError, &format!("{}", &e)))?;
             gas_added += gasu;
             let resv = StackItem::buf(cres);

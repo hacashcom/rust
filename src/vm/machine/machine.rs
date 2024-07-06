@@ -7,8 +7,8 @@ pub struct Machine {
     global_vals: KVMap,
     memory_vals: HashMap<ContractAddress, KVMap>,
     // call_stacks: CallStack,
-    extn_caller: Arc<dyn ExtActCaller>,
-    out_storage: Arc<dyn OutStorager>,
+    extn_caller: Box<dyn ExtActCaller>,
+    out_storage: Box<dyn OutStorager>,
     // entry_codes: Vec<u8>,
     contract_cache: HashMap<ContractAddress, ContractStorage>,
 }
@@ -19,8 +19,8 @@ impl Machine {
 
     pub fn new(
         gas_limit: i64, 
-        extn_caller: Arc<dyn ExtActCaller>,
-        out_storage: Arc<dyn OutStorager>,
+        extn_caller: Box<dyn ExtActCaller>,
+        out_storage: Box<dyn OutStorager>,
     ) -> Machine {
         let space_cap = SpaceCap::new();
         let gas_table = GasTable::new();

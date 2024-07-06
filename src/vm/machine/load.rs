@@ -20,7 +20,9 @@ impl Machine {
             return itr_err_fmt!(OutOfLoadContract, "max contract number be loaded in one tx is {}", maxcn)
         }
         let ctky = contract_store_key(addr);
-        match self.out_storage.read(ctky) {
+        match self.out_storage.get(&ctky).map_err(
+            |e|ItrErr::new(OutStorageError, &format!("{}", &e))
+        )? {
             Some(con) => {
                 let obj = ContractStorage::build(&con).map_err(|e|
                     ItrErr::new(ContractError, &format!("contract {} parse error {}", 

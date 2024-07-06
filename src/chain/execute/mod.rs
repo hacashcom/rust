@@ -21,6 +21,7 @@ use crate::core::state::*;
 use crate::protocol::block;
 use crate::protocol::transaction;
 use crate::protocol::operate;
+use crate::protocol::action;
 
 use crate::mint::checker::*;
 

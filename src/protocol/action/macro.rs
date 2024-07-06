@@ -111,11 +111,10 @@ impl Action for $actname {
 }
 
 impl ActExec for $actname {
-    fn execute(&$p_self, $p_env: &mut dyn ExecContext, $p_state: &mut dyn State, $p_store: &dyn Store) -> Box<dyn ExecResult> {
+    fn execute(&$p_self, $p_env: &mut dyn ExecContext, $p_state: &mut dyn State, $p_store: &dyn Store) -> Ret<(i64, Vec<u8>)> {
         let mut $p_gas = $p_self.gas() as i64; // gas
-        let mut res = |$p_gas: &mut i64|->Ret<Vec<u8>>{ $execblock };
-        let v = res(&mut $p_gas);
-        ActExecRes::create($p_gas, v)
+        let res: Ret<Vec<u8>> = $execblock;
+        Ok(($p_gas, res?))
     }
 }
 

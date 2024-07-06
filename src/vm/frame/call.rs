@@ -15,6 +15,7 @@ macro_rules! do_execute_code {
             $self.gas_table,
             $self.gas_extra,
             $self.extn_caller,
+            $self.out_storage,
             $self.local,
             $self.stack,
             $self.is_sys_call,
@@ -24,7 +25,7 @@ macro_rules! do_execute_code {
     }
 }
 
-impl FrameExec<'_, '_> {
+impl FrameExec<'_, '_, '_> {
 
     #[inline(always)]
     pub fn call(&mut self) -> VmrtRes<CallExit> {

@@ -5,6 +5,7 @@ use crate::vm::*;
 use crate::vm::rt::*;
 use crate::vm::value::*;
 use crate::vm::interpreter::*;
+use crate::interface::vm::*;
 
 
 pub fn main_test98237456289375() {
@@ -26,10 +27,9 @@ pub fn main_vm_machine_call(codes: &str) {
     let mut codes = hex::decode(codes).unwrap();
 
     let mut gas = 1000000i64;
-    let mut extcaller = TestExtActCaller::new();
-    let mut outstorer = TestOutStorager::new();
-    let mut machine = vm::machine::Machine::new(gas, 
-        Arc::new(extcaller), Arc::new(outstorer));
+    let extcaller = TestExtActCaller::new();
+    let outstorer = TestOutStorager::new();
+    let mut machine = vm::machine::Machine::new( gas, Box::new(extcaller), Box::new(outstorer) );
 
     let adr1 = Address::min();
     println!("Address::min() = {}", &adr1.readable());
@@ -64,8 +64,10 @@ pub fn main_vm_frame_call_2834756283974() {
         CallMode::External, 0, codes, iptv);
     // do call
     let now = Instant::now();
+    let mut extcaller = vm::interpreter::TestExtActCaller::new();
+    let mut outstorer = vm::interpreter::TestOutStorager::new();
     let res = frame.exec(
-        &mut gas, &GasTable::new(), &GasExtra::new(), &mut TestExtActCaller::new(), false,
+        &mut gas, &GasTable::new(), &GasExtra::new(), &mut extcaller, &mut outstorer, false,
     ).call();
     println!("benchmark run time = {:?}", Instant::now().duration_since(now));
 
@@ -93,8 +95,10 @@ pub fn main_vm_execute_89234765982374() {
     loop {
         let mode = CallMode::External;
         let mut pc: usize = 0;
+        let mut extcaller = vm::interpreter::TestExtActCaller::new();
+        let mut outstorer = vm::interpreter::TestOutStorager::new();
         res = vm::interpreter::execute_code(&codes, &mut pc, &mode, 
-            &mut gas_usable, &gas_table, &gas_extra, &mut TestExtActCaller::new(),
+            &mut gas_usable, &gas_table, &gas_extra, &mut extcaller, &mut outstorer,
             &mut locals, &mut operand_stack, false, 0);
         lpnm -= 1;
         if lpnm <= 0 { break }

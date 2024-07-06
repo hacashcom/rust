@@ -17,7 +17,7 @@ pub struct Frame {
 } 
 
 
-pub struct FrameExec<'a, 'b> {
+pub struct FrameExec<'a, 'b, 'c> {
     is_sys_call: bool,
     depth: usize,
     //
@@ -32,8 +32,9 @@ pub struct FrameExec<'a, 'b> {
     pub gas_limit: &'b mut i64,
     gas_table: &'b GasTable,
     gas_extra: &'b GasExtra,
-    extn_caller: &'b dyn ExtActCaller,
-} 
+    extn_caller: &'c mut dyn ExtActCaller,
+    out_storage: &'c mut dyn OutStorager,
+}
 
 
 impl Frame {
@@ -53,13 +54,14 @@ impl Frame {
         }
     }
 
-    pub fn exec<'a, 'b>(&'a mut self, 
+    pub fn exec<'a, 'b, 'c>(&'a mut self, 
         gas_limit: &'b mut i64,
         gas_table: &'b GasTable,
         gas_extra: &'b GasExtra,
-        extn_caller: &'b dyn ExtActCaller,
+        extn_caller: &'c mut dyn ExtActCaller,
+        out_storage: &'c mut dyn OutStorager,
         is_sys_call: bool,
-    ) -> FrameExec<'a, 'b> {
+    ) -> FrameExec<'a, 'b, 'c> {
         FrameExec {
             is_sys_call,
             depth: self.depth,
@@ -74,6 +76,7 @@ impl Frame {
             gas_table,
             gas_extra,
             extn_caller,
+            out_storage,
         } 
     }
 

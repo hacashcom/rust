@@ -1,18 +1,20 @@
 
 pub trait ExtActCaller {
     // fn cutout(&self, _: &[u8]) -> Result<Vec<u8>, Error>;
-    fn call(&self, kind: u16, body: &[u8]) -> Result<(i64, Vec<u8>), Error>;
+    fn call(&mut self, kind_and_body: Vec<u8>) -> Ret<(i64, Vec<u8>)>;
 }
-
 
 
 pub trait OutStorager {
     // forever store
-    fn read(&self, key: Vec<u8>) -> Option<Vec<u8>>;
-    // return: gas use
-    // fn set(&self, key: Vec<u8>, value: Vec<u8>) -> Result<i64, Error>;
-    // fn get(&self, key: Vec<u8>) -> Option<Vec<u8>>;
-    // fn exp(&self, key: Vec<u8>, tcc: usize) -> Result<i64, Error>;
-    // fn del(&self, key: Vec<u8>) -> Result<i64, Error>; // refund gas
+    fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>>;
+    fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr;
+    fn del(&mut self, key: &[u8]) -> RetErr;
 }
+
+
+
+
+
+
 

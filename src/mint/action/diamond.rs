@@ -50,7 +50,7 @@ fn diamond_transfer(this: &DiamondTransfer, ctx: &dyn ExecContext, sta: &mut dyn
     [self.from], // req sign
     {
         // gas = dia num * 6
-        *gas += self.diamonds.count().uint() as i64 * DiamondName::width() as i64;
+        gas += self.diamonds.count().uint() as i64 * DiamondName::width() as i64;
         diamond_from_to_transfer(self, ctx, state, store)
     }
 }
@@ -90,7 +90,7 @@ fn diamond_from_to_transfer(this: &DiamondFromToTransfer, ctx: &dyn ExecContext,
     [], // req sign
     {
         // gas = dia num * 6
-        *gas += self.diamonds.count().uint() as i64 * DiamondName::width() as i64;
+        gas += self.diamonds.count().uint() as i64 * DiamondName::width() as i64;
         diamond_multiple_transfer(self, ctx, state, store)
     }
 }

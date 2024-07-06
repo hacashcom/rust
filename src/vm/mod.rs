@@ -23,8 +23,6 @@ pub mod machine;
 
 
 
-
-
 /*
 
 pub struct HacashVM {

@@ -19,6 +19,8 @@
     { 
         let addr = Fixed21{ bytes: [0u8; 21] };
         let codes = [74u8,89];
+        // let mut extcaller = vm::interpreter::TestExtActCaller::new();
+        // let mut outstorer = vm::interpreter::TestOutStorager::new();
         ctx.vm().main_call(&addr, &codes)
     }
 }

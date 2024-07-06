@@ -56,7 +56,8 @@ impl Machine {
                     &mut self.gas_limit,
                     &self.gas_table,
                     &self.gas_extra,
-                    self.extn_caller.as_ref(),
+                    self.extn_caller.as_mut(),
+                    self.out_storage.as_mut(),
                     is_sys_call,
                 )
             }

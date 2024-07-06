@@ -12,11 +12,12 @@ use crate::base::field::*;
 use crate::core::field::*;
 use crate::protocol::operate::*;
 
+use crate::vm;
 
 
 include!("level.rs");
 include!("macro.rs");
 include!("hacash.rs");
 include!("contract.rs");
-include!("scriptexec.rs");
+include!("script.rs");
 include!("action.rs");

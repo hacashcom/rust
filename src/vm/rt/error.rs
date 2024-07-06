@@ -40,6 +40,7 @@ pub enum ItrErrCode {
     NativeCall = 43,
 
     ExtActCallError = 51,
+    OutStorageError = 55,
 
     ThrowAbort = 101, // user code call
 }

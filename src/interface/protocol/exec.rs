@@ -23,10 +23,11 @@ pub trait ExecContext {
     //
     fn vm(&mut self) -> &mut dyn VMIvk { panic_never_call_this!() }
     // fn vm_main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> { panic_never_call_this!() }
+    // fn exec_act(&mut self) -> Box<dyn ExecResult> { panic_never_call_this!() }
 }
 
 pub trait ActExec {
-    fn execute(&self, _: &mut dyn ExecContext, _: &mut dyn State, _: &dyn Store) -> Box<dyn ExecResult> { panic_never_call_this!() }
+    fn execute(&self, _: &mut dyn ExecContext, _: &mut dyn State, _: &dyn Store) -> Ret<(i64, Vec<u8>)> { panic_never_call_this!() }
 }
 
 pub trait TxExec {

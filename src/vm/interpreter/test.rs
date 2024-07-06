@@ -13,7 +13,7 @@ impl TestExtActCaller {
 
 impl ExtActCaller for TestExtActCaller {
 
-    fn call(&self, kind: u16, _: &[u8]) -> Result<(i64, Vec<u8>), Error> {
+    fn call(&mut self, kb: Vec<u8>) -> Result<(i64, Vec<u8>), Error> {
         Ok((10, vec![1]))
     }
 
@@ -35,8 +35,13 @@ impl TestOutStorager {
 
 
 impl OutStorager for TestOutStorager {
-    fn read(&self, key: Vec<u8>) -> Option<Vec<u8>>
-    {
-        Some(vec![1,0,0,1])
+    fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
+        Ok(Some(vec![1,0,0,1]))
+    }
+    fn del(&mut self, key: &[u8]) -> RetErr {
+        Ok(())
+    }
+    fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr {
+        Ok(())
     }
 }

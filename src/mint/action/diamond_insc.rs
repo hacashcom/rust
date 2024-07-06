@@ -15,7 +15,7 @@
     false, // burn 90
     [], // req sign
     {
-        *gas += 0;
+        gas += 0;
         diamond_inscription(self, ctx, state, store)
     }
 }
