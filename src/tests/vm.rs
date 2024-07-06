@@ -29,7 +29,7 @@ pub fn main_vm_machine_call(codes: &str) {
     let mut gas = 1000000i64;
     let mut extcaller = TestExtActCaller::new();
     let mut outstorer = TestOutStorager::new();
-    let mut machine = vm::machine::Machine::new( gas, Box::new(extcaller), Box::new(outstorer) );
+    let mut machine = vm::machine::Machine::new( gas, &mut extcaller, &mut outstorer );
 
     let adr1 = Address::min();
     println!("Address::min() = {}", &adr1.readable());

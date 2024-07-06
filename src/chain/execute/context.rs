@@ -7,10 +7,10 @@ pub struct ExecEnvObj<'a> {
     pdhash: Hash,
     mainaddr: Address,
     tx: &'a dyn TransactionRead,
-    extcaller: Option<*mut ExecCaller<'a>>,
-    outstorer: Option<*mut ExecCaller<'a>>,
+    // extcaller: Option<*mut ExecCaller<'a>>,
+    // outstorer: Option<*mut ExecCaller<'a>>,
     // vm
-    vmobj: Option<Box<dyn VMIvk>>,
+    vmobj: Option<&'a mut dyn VMIvk>,
 }
 
 
@@ -27,8 +27,8 @@ impl ExecEnvObj<'_> {
             pdhash: Hash::default(),
             mainaddr: tx.address().unwrap(),
             tx,
-            extcaller: None,
-            outstorer: None,
+            // extcaller: None,
+            // outstorer: None,
             vmobj: None,
         }
     }
@@ -63,23 +63,8 @@ impl ExecContext for ExecEnvObj<'_> {
     fn fast_sync(&self) -> bool {
         self.fastsync
     }
-    fn vm<'a>(&'a mut self) -> &'a mut dyn VMIvk{
-        if let None = self.vmobj {
-
-            let fee_zhu = self.tx_fee().to_zhu_unsafe() as i64;
-            let txsz = self.tx.size() as i64;
-            let gas_price = fee_zhu / txsz;
-            let gas = 1000000i64;
-            let extcaller = vm::interpreter::TestExtActCaller::new();
-            let outstorer = vm::interpreter::TestOutStorager::new();
-            let t1 = Box::new(extcaller);
-            let t2 = Box::new(outstorer);
-            // let t1 = Box::new(ExtActCallerOutStorager::new(self.extcaller.take().unwrap()));
-            // let t2 = Box::new(ExtActCallerOutStorager::new(self.extcaller.take().unwrap()));
-            let mut vm = vm::machine::Machine::new( gas, t1, t2);
-            self.vmobj = Some(Box::new(vm));
-        }
-        self.vmobj.as_mut().unwrap().as_mut()
+    fn vm(&mut self) -> &mut dyn VMIvk {
+        *self.vmobj.as_mut().unwrap()
     }
 }
 

@@ -6,7 +6,7 @@ pub fn contract_store_key(addr: &ContractAddress) -> Vec<u8> {
 }
 
 
-impl Machine {
+impl Machine<'_> {
 
     fn load_contract(&mut self, addr: &ContractAddress) -> VmrtRes<&ContractStorage> {
         // check cache

@@ -1,6 +1,6 @@
 
 
-impl VMIvk for Machine {
+impl VMIvk for Machine<'_> {
     
     fn main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> {
         Ok(self.do_main_call(entry, irs).map_err(|e|e.to_string())?.cast_to_buf())
@@ -14,7 +14,7 @@ impl VMIvk for Machine {
 }
 
 
-impl Machine {
+impl Machine<'_> {
 
 
     pub fn do_main_call(&mut self, entry: &Address, irs: &[u8]) -> VmrtRes<StackItem> {
@@ -56,8 +56,8 @@ impl Machine {
                     &mut self.gas_limit,
                     &self.gas_table,
                     &self.gas_extra,
-                    self.extn_caller.as_mut(),
-                    self.out_storage.as_mut(),
+                    self.extn_caller,
+                    self.out_storage,
                     is_sys_call,
                 )
             }
