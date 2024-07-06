@@ -7,8 +7,8 @@ pub struct ExecEnvObj<'a> {
     pdhash: Hash,
     mainaddr: Address,
     tx: &'a dyn TransactionRead,
-    // extcaller: &mut dyn ExtActCaller,
-    // outstorer: &mut dyn OutStorager,
+    extcaller: Option<*mut ExecCaller<'a>>,
+    outstorer: Option<*mut ExecCaller<'a>>,
     // vm
     vmobj: Option<Box<dyn VMIvk>>,
 }
@@ -19,10 +19,6 @@ impl ExecEnvObj<'_> {
     pub fn new<'a>(
         pdhei: u64, 
         tx: &'a dyn TransactionRead,
-        // bst: &'a mut dyn State, 
-        // sto: &'a dyn Store, 
-        // extcaller: &mut dyn ExtActCaller,
-        // outstorer: &mut dyn OutStorager,
     ) -> ExecEnvObj<'a> {
 
         ExecEnvObj {
@@ -31,10 +27,8 @@ impl ExecEnvObj<'_> {
             pdhash: Hash::default(),
             mainaddr: tx.address().unwrap(),
             tx,
-            // bst,
-            // sto,
-            // extcaller,
-            // outstorer,
+            extcaller: None,
+            outstorer: None,
             vmobj: None,
         }
     }
@@ -69,17 +63,20 @@ impl ExecContext for ExecEnvObj<'_> {
     fn fast_sync(&self) -> bool {
         self.fastsync
     }
-    fn vm(&mut self) -> &mut dyn VMIvk{
+    fn vm<'a>(&'a mut self) -> &'a mut dyn VMIvk{
         if let None = self.vmobj {
+
             let fee_zhu = self.tx_fee().to_zhu_unsafe() as i64;
             let txsz = self.tx.size() as i64;
             let gas_price = fee_zhu / txsz;
             let gas = 1000000i64;
-
             let extcaller = vm::interpreter::TestExtActCaller::new();
             let outstorer = vm::interpreter::TestOutStorager::new();
-            
-            let vm = vm::machine::Machine::new( gas, Box::new(extcaller), Box::new(outstorer) );
+            let t1 = Box::new(extcaller);
+            let t2 = Box::new(outstorer);
+            // let t1 = Box::new(ExtActCallerOutStorager::new(self.extcaller.take().unwrap()));
+            // let t2 = Box::new(ExtActCallerOutStorager::new(self.extcaller.take().unwrap()));
+            let mut vm = vm::machine::Machine::new( gas, t1, t2);
             self.vmobj = Some(Box::new(vm));
         }
         self.vmobj.as_mut().unwrap().as_mut()
@@ -91,7 +88,7 @@ impl ExecContext for ExecEnvObj<'_> {
 
 
 pub struct ExecCaller<'a> {
-    ctx: &'a mut ExecEnvObj<'a>,
+    ctx: *mut ExecEnvObj<'a>,
     bst: &'a mut dyn State, 
     sto: &'a dyn Store, 
 }
@@ -99,7 +96,7 @@ pub struct ExecCaller<'a> {
 impl ExecCaller<'_> {
 
     pub fn new<'a>(
-        ctx: &'a mut ExecEnvObj<'a>,
+        ctx: *mut ExecEnvObj<'a>,
         bst: &'a mut dyn State, 
         sto: &'a dyn Store, 
     ) -> ExecCaller<'a> {
@@ -112,10 +109,11 @@ impl ExecCaller<'_> {
     }
 
     fn exec(&mut self, act: &dyn Action) -> Ret<(i64, Vec<u8>)> {
-        act.execute(self.ctx, self.bst, self.sto)
+        unsafe { act.execute(&mut *self.ctx, self.bst, self.sto) }
     }
 
 }
+
 
 impl ExtActCaller for ExecCaller<'_> {
 
@@ -126,4 +124,55 @@ impl ExtActCaller for ExecCaller<'_> {
         }
         self.exec(act.as_ref())
     }
+}
+
+
+impl OutStorager for ExecCaller<'_> {
+    fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
+        Ok(Some(vec![1,0,0,1]))
+    }
+    fn del(&mut self, key: &[u8]) -> RetErr {
+        Ok(())
+    }
+    fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr {
+        Ok(())
+    }
+}
+
+
+// 
+
+
+pub struct ExtActCallerOutStorager<'a> {
+    pub wrap: *mut ExecCaller<'a>,
+}
+
+impl ExtActCallerOutStorager<'_> {
+    pub fn new(w: *mut ExecCaller) -> ExtActCallerOutStorager {
+        ExtActCallerOutStorager {
+            wrap: w,
+        }
+    }
+}
+
+impl ExtActCaller for ExtActCallerOutStorager<'_> {
+
+    fn call(&mut self, kind_and_body: Vec<u8>) -> Ret<(i64, Vec<u8>)> {
+        unsafe{ (*self.wrap).call(kind_and_body) }
+    }
+}
+
+
+impl OutStorager for ExtActCallerOutStorager<'_> {
+
+    fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
+        Ok(Some(vec![1,0,0,1]))
+    }
+    fn del(&mut self, key: &[u8]) -> RetErr {
+        Ok(())
+    }
+    fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr {
+        Ok(())
+    }
+
 }

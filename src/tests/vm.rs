@@ -27,8 +27,8 @@ pub fn main_vm_machine_call(codes: &str) {
     let mut codes = hex::decode(codes).unwrap();
 
     let mut gas = 1000000i64;
-    let extcaller = TestExtActCaller::new();
-    let outstorer = TestOutStorager::new();
+    let mut extcaller = TestExtActCaller::new();
+    let mut outstorer = TestOutStorager::new();
     let mut machine = vm::machine::Machine::new( gas, Box::new(extcaller), Box::new(outstorer) );
 
     let adr1 = Address::min();
