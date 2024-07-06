@@ -114,50 +114,14 @@ impl ExtActCaller for ExecCaller<'_> {
 
 impl OutStorager for ExecCaller<'_> {
     fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
-        Ok(Some(vec![1,0,0,1]))
+        Ok( self.bst.get_at(key).map(|d|d.as_ref().to_vec()) )
     }
     fn del(&mut self, key: &[u8]) -> RetErr {
+        self.bst.del_at(key);
         Ok(())
     }
     fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr {
+        self.bst.set_at(key, value);
         Ok(())
     }
-}
-
-
-// 
-
-
-pub struct ExtActCallerOutStorager<'a> {
-    pub wrap: *mut ExecCaller<'a>,
-}
-
-impl ExtActCallerOutStorager<'_> {
-    pub fn new(w: *mut ExecCaller) -> ExtActCallerOutStorager {
-        ExtActCallerOutStorager {
-            wrap: w,
-        }
-    }
-}
-
-impl ExtActCaller for ExtActCallerOutStorager<'_> {
-
-    fn call(&mut self, kind_and_body: Vec<u8>) -> Ret<(i64, Vec<u8>)> {
-        unsafe{ (*self.wrap).call(kind_and_body) }
-    }
-}
-
-
-impl OutStorager for ExtActCallerOutStorager<'_> {
-
-    fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
-        Ok(Some(vec![1,0,0,1]))
-    }
-    fn del(&mut self, key: &[u8]) -> RetErr {
-        Ok(())
-    }
-    fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr {
-        Ok(())
-    }
-
 }
