@@ -26,8 +26,9 @@ impl Machine<'_> {
 
     pub fn do_sys_call(&mut self, entry: &Address, fnty: SystemCallType, input: Vec<u8>) -> VmrtRes<StackItem> {
         let entry = address_to_contract(entry);
+        self.check_contract_count(&entry)?;
         let mut loader = self.code_load.lock().unwrap();
-        let codes = loader.load_syscall(self.out_storage_read, &entry, fnty)?.to_vec();
+        let codes = loader.load_syscall(self.out_storead, &entry, fnty)?.to_vec();
         drop(loader);
         self.do_call(entry, codes, StackItem::buf(input), true)
     }
@@ -116,13 +117,14 @@ impl Machine<'_> {
             // load code        
             let mut loader = self.code_load.lock().unwrap();
             let (contract_addr, load_codes) = loader.load_by_funcptr(
-                self.out_storage_read,
+                self.out_storead,
                 &cur_ctx_addr,
                 &cur_ivk_addr,
                 &funcptr,
             )?;
             let load_codes = load_codes.to_vec();
             drop(loader);
+            self.check_contract_count(&contract_addr)?;
             let mut next_ivk_addr = contract_addr;
 
             // mode: code

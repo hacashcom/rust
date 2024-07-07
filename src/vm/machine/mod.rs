@@ -1,6 +1,6 @@
 
 use std::sync::{ Mutex, Arc };
-use std::collections::{ HashMap };
+use std::collections::{ HashMap, HashSet };
 
 use crate::sys::*;
 use crate::core::field::*;
@@ -17,7 +17,8 @@ use super::stack::*;
 use super::frame::*;
 use super::contract::*;
 
-include!("machine.rs");
 include!("load.rs");
+include!("resource.rs");
 include!("execute.rs");
+include!("machine.rs");
 

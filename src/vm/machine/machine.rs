@@ -10,9 +10,9 @@ pub struct Machine<'a> {
     // call_stacks: CallStack,
     extn_caller: &'a mut dyn ExtActCaller,
     out_storage: &'a mut dyn OutStorager,
-    out_storage_read: &'a mut dyn OutStoragerRead,
+    out_storead: &'a mut dyn OutStoragerRead,
     // entry_codes: Vec<u8>,
-    // contract_cache: HashMap<ContractAddress, ContractStorage>,
+    contract_count: HashSet<ContractAddress>,
 }
 
 
@@ -24,7 +24,7 @@ impl Machine<'_> {
         gas_limit: i64, 
         extn_caller: &'a mut dyn ExtActCaller,
         out_storage: &'a mut dyn OutStorager,
-        out_storage_read: &'a mut dyn OutStoragerRead,
+        out_storead: &'a mut dyn OutStoragerRead,
     ) -> Machine<'a> {
         let space_cap = SpaceCap::new();
         let gas_table = GasTable::new();
@@ -41,8 +41,8 @@ impl Machine<'_> {
             memory_vals: HashMap::new(),
             extn_caller,
             out_storage,
-            out_storage_read,
-            // contract_cache: HashMap::new(),
+            out_storead,
+            contract_count: HashSet::new(),
         }
     }
 
@@ -51,6 +51,11 @@ impl Machine<'_> {
     }
 
 }
+
+
+
+
+
 
 
 
