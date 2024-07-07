@@ -1,3 +1,10 @@
+
+
+use std::rc::{ Rc };
+use std::collections::{ HashMap, VecDeque };
+use std::collections::hash_map::Entry::Occupied;
+
+
 use crate::sys::*;
 use crate::interface::field::*;
 use crate::interface::vm::*;
@@ -14,6 +21,7 @@ use super::ir::*;
 include!("type.rs");
 include!("store.rs");
 include!("object.rs");
+include!("loader.rs");
 include!("util.rs");
 
 

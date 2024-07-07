@@ -18,6 +18,15 @@ impl ContractStorage {
         Ok(address_to_contract(&ary[idx]))
     }
 
+    pub fn librarys(&self) -> Vec<ContractAddress> {
+        let ary = self.contlhead.librarys.list();
+        let mut res = Vec::with_capacity(ary.len());
+        for a in ary {
+            res.push(address_to_contract(a))
+        }
+        res
+    }
+
     pub fn inherits(&self) -> Vec<ContractAddress> {
         let ary = self.contlhead.inherits.list();
         let mut res = Vec::with_capacity(ary.len());
@@ -44,7 +53,7 @@ impl ContractStorage {
         let ary = self.userfuncs.list();
         for a in ary {
             if fnsign == a.sign.as_ref() {
-                return convert_to_bytecodes(a)
+                return compile_to_bytecodes(a)
             }
         }
         // not find
@@ -57,7 +66,7 @@ impl ContractStorage {
         let ary = self.sytmcalls.list();
         for a in ary {
             if fnty == a.sign[0] {
-                return convert_to_bytecodes(a)
+                return compile_to_bytecodes(a)
             }
         }
         // not find

@@ -1,5 +1,12 @@
 
 
+pub fn contract_store_key(addr: &ContractAddress) -> Vec<u8> {
+    // hvm-contract-code-object-storage-key
+    vec![b"hvmccosk".to_vec(), addr.to_vec()].concat()
+}
+
+
+
 // Contract address list
 StructFieldList!(ContractAddrsssList, count, Uint1, addrs, Address);
 

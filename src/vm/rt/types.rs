@@ -77,3 +77,14 @@ pub enum SystemCallType {
 
 
 
+//////////////////////////////////////////
+
+
+
+pub enum FnKeyObj {
+    Sys(SystemCallType),
+    Usr(FnSign),
+}
+
+
+

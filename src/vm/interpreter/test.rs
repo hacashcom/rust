@@ -34,10 +34,13 @@ impl TestOutStorager {
 }
 
 
-impl OutStorager for TestOutStorager {
+impl OutStoragerRead for TestOutStorager {
     fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
         Ok(Some(vec![1,0,0,1]))
     }
+}
+
+impl OutStorager for TestOutStorager {
     fn del(&mut self, key: &[u8]) -> RetErr {
         Ok(())
     }

@@ -112,10 +112,14 @@ impl ExtActCaller for ExecCaller<'_> {
 }
 
 
-impl OutStorager for ExecCaller<'_> {
+impl OutStoragerRead for ExecCaller<'_> {
     fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>> {
         Ok( self.bst.get_at(key).map(|d|d.as_ref().to_vec()) )
     }
+}
+
+
+impl OutStorager for ExecCaller<'_> {
     fn del(&mut self, key: &[u8]) -> RetErr {
         self.bst.del_at(key);
         Ok(())
@@ -125,3 +129,8 @@ impl OutStorager for ExecCaller<'_> {
         Ok(())
     }
 }
+
+
+impl OutContext for ExecCaller<'_> { }
+
+

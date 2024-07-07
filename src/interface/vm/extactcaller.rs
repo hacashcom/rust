@@ -5,12 +5,24 @@ pub trait ExtActCaller {
 }
 
 
-pub trait OutStorager {
+pub trait OutStoragerRead {
     // forever store
     fn get(&self, key: &[u8]) -> Ret<Option<Vec<u8>>>;
+}
+
+
+pub trait OutStorager: OutStoragerRead {
+    // forever store
     fn set(&mut self, key: &[u8], value: Vec<u8>) -> RetErr;
     fn del(&mut self, key: &[u8]) -> RetErr;
 }
+
+
+pub trait OutContext: ExtActCaller + OutStorager {
+
+}
+
+
 
 
 

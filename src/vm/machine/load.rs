@@ -1,11 +1,6 @@
 
 
-pub fn contract_store_key(addr: &ContractAddress) -> Vec<u8> {
-    // hvm-contract-code-object-storage-key
-    vec![addr.to_vec(), b"hvmccosk".to_vec()].concat()
-}
-
-
+/*
 impl Machine<'_> {
 
     fn load_contract(&mut self, addr: &ContractAddress) -> VmrtRes<&ContractStorage> {
@@ -92,6 +87,6 @@ impl Machine<'_> {
     }
 
 }
-
+*/
 
 

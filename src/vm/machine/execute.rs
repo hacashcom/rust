@@ -21,12 +21,14 @@ impl Machine<'_> {
         // parse
         let codes = parse_ir_block(irs, &mut 0)?.codegen();
         let entry = address_to_contract(entry);
-        self.do_call(entry, codes, StackItem::nil(), false)
+        self.do_call(entry, codes.to_vec(), StackItem::nil(), false)
     }
 
     pub fn do_sys_call(&mut self, entry: &Address, fnty: SystemCallType, input: Vec<u8>) -> VmrtRes<StackItem> {
         let entry = address_to_contract(entry);
-        let codes = self.load_codes_by_syscall(&entry, fnty)?;
+        let mut loader = self.code_load.lock().unwrap();
+        let codes = loader.load_syscall(self.out_storage_read, &entry, fnty)?.to_vec();
+        drop(loader);
         self.do_call(entry, codes, StackItem::buf(input), true)
     }
 
@@ -111,12 +113,16 @@ impl Machine<'_> {
                 return itr_err_fmt!(CallInvalid, "Sys call mode invalid call: {:?}", funcptr)
             }
 
-            // load code
-            let (contract_addr, load_codes) = self.load_codes_by_funcptr(
+            // load code        
+            let mut loader = self.code_load.lock().unwrap();
+            let (contract_addr, load_codes) = loader.load_by_funcptr(
+                self.out_storage_read,
                 &cur_ctx_addr,
                 &cur_ivk_addr,
                 &funcptr,
             )?;
+            let load_codes = load_codes.to_vec();
+            drop(loader);
             let mut next_ivk_addr = contract_addr;
 
             // mode: code
@@ -148,7 +154,7 @@ impl Machine<'_> {
                     }
                 }
                 let mut next_frame = Frame::new(next_ivk_addr, next_ctx_addr, 
-                    funcptr.mode, next_depth, load_codes, fnargv);
+                    funcptr.mode, next_depth, load_codes.to_vec(), fnargv);
                 current_frame = next_frame;
                 continue
             }

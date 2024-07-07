@@ -19,13 +19,14 @@ pub fn exec_tx_actions(is_fast_sync: bool, pending_height: u64, pending_hash: Ha
     let mut extcaller = ExecCaller::new(ctxptr, bst, sto);
     let callptr1: *mut ExecCaller = &mut extcaller;
     let callptr2 = callptr1;
-    
+    let callptr3 = callptr1;
 
     // let t1 = Box::new(ExtActCallerOutStorager::new(callptr1));
     // let t2 = Box::new(ExtActCallerOutStorager::new(callptr2));
     let t1 = unsafe{ &mut *callptr1 };
     let t2 = unsafe{ &mut *callptr2 };
-    let mut vm = vm::machine::Machine::new( gas, t1, t2);
+    let t3 = unsafe{ &mut *callptr3 };
+    let mut vm = vm::boot_machine( gas, t1, t2, t3);
 
     // ptr
     ctx.pdhash = pending_hash;

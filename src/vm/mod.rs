@@ -1,5 +1,5 @@
 
-use std::sync::{ Arc };
+use std::sync::{ Mutex, Arc };
 
 use crate::protocol::transaction::DynListAction;
 use crate::sys::*;
@@ -19,6 +19,79 @@ pub mod interpreter;
 pub mod native;
 pub mod contract;
 pub mod machine;
+
+use rt::*;
+use contract::*;
+use machine::*;
+
+
+lazy_static! {
+    static ref CONTRACT_LOADER: Arc<Mutex<ContractLoader>> = Arc::new(Mutex::new(
+        ContractLoader::new(&SpaceCap::new())
+    ));
+}
+
+
+pub fn code_loader() -> Arc<Mutex<ContractLoader>> {
+    CONTRACT_LOADER.clone()
+}
+
+
+pub fn boot_machine<'a>(gas: i64,
+    extn_caller: &'a mut dyn ExtActCaller,
+    out_storage: &'a mut dyn OutStorager,
+    out_storage_read: &'a mut dyn OutStoragerRead,
+) -> Machine<'a> {
+
+    machine::Machine::new(code_loader(), gas, 
+        extn_caller, out_storage, out_storage_read)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
