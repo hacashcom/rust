@@ -69,6 +69,12 @@ impl Machine<'_> {
         }
     }
 
+    pub fn gas_refund(&self) -> i64 {
+        self.gas_limit
+    }
+
+
+
     pub fn printdebug(&mut self) {
         println!("gas_limit = {}", self.gas_limit)
     }

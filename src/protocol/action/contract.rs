@@ -23,7 +23,7 @@
  */
  ActionDefine!{
     ContractUpgrade : 36, (
-        from : Address
+        addr : Address
     ),
     ACTLV_TOP_ONLY, // level
     11, // gas = 32
@@ -31,6 +31,9 @@
     true, // burn 90
     [], // req sign
     {
+        vm::code_loader().lock().unwrap().clear_upgraded(
+            &vm::rt::address_to_contract(&self.addr)
+        );
         Ok(vec![])
     }
 }

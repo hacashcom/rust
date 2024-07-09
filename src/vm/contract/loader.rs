@@ -72,7 +72,7 @@ impl ContractLoader {
 
     }
 
-    pub fn remove_upgraded(&mut self, addr: &ContractAddress) {
+    pub fn clear_upgraded(&mut self, addr: &ContractAddress) {
         self.cache_bodys.remove(addr);
         self.cache_libxs.remove(addr);
         self.cache_bodyary.retain(|x|x!=addr);
@@ -81,7 +81,7 @@ impl ContractLoader {
         self.cache_funcs.retain(|x,_|&x[0..21]!=addr);
     }
 
-    
+
 }
 
 

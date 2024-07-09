@@ -9,6 +9,7 @@ pub trait TransactionRead : Field + Send + Sync + dyn_clone::DynClone {
     fn address(&self) -> Ret<Address> { panic_never_call_this!() }
     fn addrlist(&self) -> &AddrOrList{ panic_never_call_this!() }
     fn fee(&self) -> &Amount { panic_never_call_this!(); }
+    fn gas_max(&self) -> u8 { panic_never_call_this!(); }
     fn timestamp(&self) -> &Timestamp { panic_never_call_this!() }
 
     fn reward(&self) -> &Amount { panic_never_call_this!() }

@@ -16,8 +16,10 @@ pub struct Resoure {
 
 impl Resoure {
 
-    pub fn reset(&mut self) {
-        
+    pub fn clear(&mut self) {
+        self.global_vals.clear();
+        self.memory_vals.clear();
+        self.contract_count.clear();
     }
 
 }
@@ -27,7 +29,7 @@ impl Resoure {
 impl Machine<'_> {
 
     pub fn release_resource(mut self) -> Resoure {
-        self.r.reset();
+        self.r.clear();
         self.r
     }
 

@@ -100,6 +100,9 @@ impl TransactionRead for $class {
     fn fee(&self) -> &Amount {
         &self.fee
     }
+    fn gas_max(&self) -> u8 { 
+        self.gas_max.value()
+     }
 
     fn timestamp(&self) -> &Timestamp {
         &self.timestamp

@@ -14,6 +14,10 @@ impl KVMap {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.datas.clear();
+    }
+
 
 
 
