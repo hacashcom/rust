@@ -29,6 +29,7 @@ lazy_static! {
     static ref CONTRACT_LOADER: Arc<Mutex<ContractLoader>> = Arc::new(Mutex::new(
         ContractLoader::new(&SpaceCap::new())
     ));
+    static ref MACHINE_RESOURCES: Arc<Mutex<Vec<Resoure>>> = Arc::default();
 }
 
 
@@ -37,17 +38,31 @@ pub fn code_loader() -> Arc<Mutex<ContractLoader>> {
 }
 
 
-pub fn boot_machine<'a>(gas: i64,
+pub fn boot_vm<'a>(gas: i64,
     extn_caller: &'a mut dyn ExtActCaller,
     out_storage: &'a mut dyn OutStorager,
     out_storage_read: &'a mut dyn OutStoragerRead,
 ) -> Machine<'a> {
 
-    machine::Machine::new(code_loader(), gas, 
-        extn_caller, out_storage, out_storage_read)
+    let (a, b, c) = (extn_caller, out_storage, out_storage_read);
+    let mut resary = MACHINE_RESOURCES.lock().unwrap();
+    match resary.len() {
+
+        0 => machine::Machine::new(gas, 
+            a, b, c, code_loader()
+        ),
+
+        _ => machine::Machine::new_by_resouce(gas, 
+            a, b, c, resary.pop().unwrap()
+        ),
+
+    }
 }
 
 
+pub fn shut_vm(machine: Machine<'_>){
+    MACHINE_RESOURCES.lock().unwrap().push( machine.release_resource() );
+}
 
 
 

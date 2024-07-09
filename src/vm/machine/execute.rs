@@ -27,7 +27,7 @@ impl Machine<'_> {
     pub fn do_sys_call(&mut self, entry: &Address, fnty: SystemCallType, input: Vec<u8>) -> VmrtRes<StackItem> {
         let entry = address_to_contract(entry);
         self.check_contract_count(&entry)?;
-        let mut loader = self.code_load.lock().unwrap();
+        let mut loader = self.r.code_load.lock().unwrap();
         let codes = loader.load_syscall(self.out_storead, &entry, fnty)?.to_vec();
         drop(loader);
         self.do_call(entry, codes, StackItem::buf(input), true)
@@ -41,7 +41,7 @@ impl Machine<'_> {
 
         use CallMode::*;
 
-        let mut max_call_depth = self.space_cap.call_depth;
+        let mut max_call_depth = self.r.space_cap.call_depth;
         let mut call_mode = CallMode::Main;
         if is_sys_call {
             max_call_depth = 1; // system call can just 1 depth
@@ -57,8 +57,8 @@ impl Machine<'_> {
             () => {
                 current_frame.exec(
                     &mut self.gas_limit,
-                    &self.gas_table,
-                    &self.gas_extra,
+                    &self.r.gas_table,
+                    &self.r.gas_extra,
                     self.extn_caller,
                     self.out_storage,
                     is_sys_call,
@@ -115,7 +115,7 @@ impl Machine<'_> {
             }
 
             // load code        
-            let mut loader = self.code_load.lock().unwrap();
+            let mut loader = self.r.code_load.lock().unwrap();
             let (contract_addr, load_codes) = loader.load_by_funcptr(
                 self.out_storead,
                 &cur_ctx_addr,

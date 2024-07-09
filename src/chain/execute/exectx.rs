@@ -17,22 +17,21 @@ pub fn exec_tx_actions(is_fast_sync: bool, pending_height: u64, pending_hash: Ha
     let ctxptr: *mut ExecEnvObj = &mut ctx;
     // create env
     let mut extcaller = ExecCaller::new(ctxptr, bst, sto);
-    let callptr1: *mut ExecCaller = &mut extcaller;
-    let callptr2 = callptr1;
-    let callptr3 = callptr1;
-
+    let callptr: *mut ExecCaller = &mut extcaller;
+    
     // let t1 = Box::new(ExtActCallerOutStorager::new(callptr1));
     // let t2 = Box::new(ExtActCallerOutStorager::new(callptr2));
-    let t1 = unsafe{ &mut *callptr1 };
-    let t2 = unsafe{ &mut *callptr2 };
-    let t3 = unsafe{ &mut *callptr3 };
-    let mut vm = vm::boot_machine( gas, t1, t2, t3);
+    let t1 = unsafe{ &mut *callptr };
+    let t2 = unsafe{ &mut *callptr };
+    let t3 = unsafe{ &mut *callptr };
+    let mut machine = vm::boot_vm( gas, t1, t2, t3);
 
     // ptr
     ctx.pdhash = pending_hash;
     ctx.fastsync = is_fast_sync;
 
-    ctx.vmobj = Some(&mut vm);
+    let vmptr: *mut vm::machine::Machine = &mut machine;
+    ctx.vmobj = Some( unsafe{ &mut *vmptr });
     // ctx.outstorer = Some(callptr2);
 
     // ignore coinbase tx
@@ -43,6 +42,7 @@ pub fn exec_tx_actions(is_fast_sync: bool, pending_height: u64, pending_hash: Ha
         // ignore return value
     }
     // ok finish successfully
+    vm::shut_vm( machine );
     Ok(())
 }
 

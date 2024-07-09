@@ -1,5 +1,6 @@
 
 pub struct Machine<'a> {
+    /*
     code_load: Arc<Mutex<ContractLoader>>,
     gas_table: GasTable,
     gas_extra: GasExtra,
@@ -7,42 +8,64 @@ pub struct Machine<'a> {
     gas_limit: i64,
     global_vals: KVMap,
     memory_vals: HashMap<ContractAddress, KVMap>,
+    contract_count: HashSet<ContractAddress>,
+    */
+    r: Resoure,
+    gas_limit: i64,
     // call_stacks: CallStack,
     extn_caller: &'a mut dyn ExtActCaller,
     out_storage: &'a mut dyn OutStorager,
     out_storead: &'a mut dyn OutStoragerRead,
     // entry_codes: Vec<u8>,
-    contract_count: HashSet<ContractAddress>,
 }
 
 
 
 impl Machine<'_> {
 
-    pub fn new<'a>(
-        code_load: Arc<Mutex<ContractLoader>>,
+    pub fn new_by_resouce<'a>(
         gas_limit: i64, 
         extn_caller: &'a mut dyn ExtActCaller,
         out_storage: &'a mut dyn OutStorager,
         out_storead: &'a mut dyn OutStoragerRead,
+        r: Resoure,
+    ) -> Machine<'a> {;
+        Machine {
+            r,
+            gas_limit,
+            extn_caller,
+            out_storage,
+            out_storead,
+        }
+    }
+
+
+    pub fn new<'a>(
+        gas_limit: i64, 
+        extn_caller: &'a mut dyn ExtActCaller,
+        out_storage: &'a mut dyn OutStorager,
+        out_storead: &'a mut dyn OutStoragerRead,
+        code_load: Arc<Mutex<ContractLoader>>,
     ) -> Machine<'a> {
         let space_cap = SpaceCap::new();
         let gas_table = GasTable::new();
         let gas_extra = GasExtra::new();
         // let call_stacks = CallStack::new();
         Machine {
-            code_load,
+            r: Resoure{
+                code_load,
+                gas_table,
+                gas_extra,
+                space_cap,
+                // call_stacks,
+                global_vals: KVMap::new(),
+                memory_vals: HashMap::new(),
+                contract_count: HashSet::new(),
+            },
             gas_limit,
-            gas_table,
-            gas_extra,
-            space_cap,
-            // call_stacks,
-            global_vals: KVMap::new(),
-            memory_vals: HashMap::new(),
             extn_caller,
             out_storage,
             out_storead,
-            contract_count: HashSet::new(),
         }
     }
 

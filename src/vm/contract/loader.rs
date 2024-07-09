@@ -1,5 +1,5 @@
 
-const FN_KEY_WIDTH: usize = 21 + 1 + 4; // Address + t + fnsign
+const FN_KEY_WIDTH: usize = 21 + 1 + 4; // Address + t + (systy|fnsign)
 
 type FnKey = [u8; FN_KEY_WIDTH];
 
@@ -80,6 +80,8 @@ impl ContractLoader {
         self.cache_funcary.retain(|x|&x[0..21]!=addr);
         self.cache_funcs.retain(|x,_|&x[0..21]!=addr);
     }
+
+    
 }
 
 
@@ -88,8 +90,12 @@ impl ContractLoader {
     /**
     * return (target_addr, codes)
     */
-    pub fn load_by_funcptr(&mut self, out_storage: &mut dyn OutStoragerRead, ctxadr: &ContractAddress, ivkadr: &ContractAddress, fnptr: &Funcptr) -> VmrtRes<(ContractAddress, &[u8])> 
-    {
+    pub fn load_by_funcptr(&mut self, 
+        out_storage: &mut dyn OutStoragerRead, 
+        ctxadr: &ContractAddress, 
+        ivkadr: &ContractAddress, 
+        fnptr: &Funcptr,
+    ) -> VmrtRes<(ContractAddress, &[u8])> {
         use CallMode::*;
         use CallTarget::*;
 
@@ -139,21 +145,32 @@ impl ContractLoader {
     /**
     * load_usrfunc
     */
-    pub fn load_usrfunc(&mut self, out_storage: &mut dyn OutStoragerRead, addr: &ContractAddress, fnsign: FnSign) -> VmrtRes<&[u8]> {
+    pub fn load_usrfunc(&mut self, 
+        out_storage: &mut dyn OutStoragerRead, 
+        addr: &ContractAddress, 
+        fnsign: FnSign,
+    ) -> VmrtRes<&[u8]> {
         self.load_func_codes(out_storage, addr, &FnKeyObj::Usr(fnsign))
     }
 
     /**
     * load_syscall
     */
-    pub fn load_syscall(&mut self, out_storage: &mut dyn OutStoragerRead, addr: &ContractAddress, syscall: SystemCallType) -> VmrtRes<&[u8]> {
+    pub fn load_syscall(&mut self, 
+        out_storage: &mut dyn OutStoragerRead, 
+        addr: &ContractAddress, 
+        syscall: SystemCallType,
+    ) -> VmrtRes<&[u8]> {
         self.load_func_codes(out_storage, addr, &FnKeyObj::Sys(syscall))
     }
 
     /**
     * check_usrfunc_cache
     */
-    fn check_usrfunc_cache(&mut self, addr: &ContractAddress, fnsign: &FnSign) -> bool {
+    fn check_usrfunc_cache(&mut self, 
+        addr: &ContractAddress, 
+        fnsign: &FnSign,
+    ) -> bool {
         let mut fnkey = [0u8; FN_KEY_WIDTH];
         fnkey[0..21].copy_from_slice(addr);
         fnkey[21] = 1;
@@ -162,7 +179,11 @@ impl ContractLoader {
         self.cache_funcs.contains_key(&fnkey)
     }
 
-    fn load_func_codes(&mut self, out_storage: &mut dyn OutStoragerRead, addr: &ContractAddress, fnk: &FnKeyObj) -> VmrtRes<&[u8]> {
+    fn load_func_codes(&mut self, 
+        out_storage: &mut dyn OutStoragerRead, 
+        addr: &ContractAddress, 
+        fnk: &FnKeyObj,
+    ) -> VmrtRes<&[u8]> {
         use FnKeyObj::*;
         let mut fnkey = [0u8; FN_KEY_WIDTH];
         fnkey[0..21].copy_from_slice(addr);
@@ -198,7 +219,10 @@ impl ContractLoader {
     }
     
 
-    fn load_inhlibs(&mut self, out_storage: &mut dyn OutStoragerRead, addr: &ContractAddress) -> VmrtRes<&InheritsAndLibs> {
+    fn load_inhlibs(&mut self, 
+        out_storage: &mut dyn OutStoragerRead, 
+        addr: &ContractAddress,
+    ) -> VmrtRes<&InheritsAndLibs> {
         // find or insert
         if self.cache_libxs.contains_key(addr) {
             return Ok(&self.cache_libxs[addr])
@@ -221,7 +245,10 @@ impl ContractLoader {
     }
 
 
-    fn load_contract(&mut self, out_storage: &mut dyn OutStoragerRead, addr: &ContractAddress) -> VmrtRes<&ContractStorage> {
+    fn load_contract(&mut self, 
+        out_storage: &mut dyn OutStoragerRead, 
+        addr: &ContractAddress,
+    ) -> VmrtRes<&ContractStorage> {
         let cache = &mut self.cache_bodys;
         // clear cache
         if self.cache_bodyary.len() > self.max_body {
