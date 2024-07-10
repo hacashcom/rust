@@ -42,7 +42,6 @@ impl BlockEngine {
         // data dir
         std::fs::create_dir_all(&cnf.store_data_dir);
         std::fs::create_dir_all(&cnf.state_data_dir);
-        std::fs::create_dir_all(&cnf.ctrkv_data_dir);
         // state & store
         let stoldb = BlockStore::open(&cnf.store_data_dir);
         let cstate = ChainState::open(&cnf.state_data_dir);

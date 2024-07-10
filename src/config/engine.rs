@@ -8,7 +8,6 @@ pub struct EngineConf {
     pub data_dir: String,
     pub store_data_dir: Box<Path>, // block data
     pub state_data_dir: Box<Path>, // chain state
-    pub ctrkv_data_dir: Box<Path>, // contract kv storage
 }
 
 
@@ -26,7 +25,6 @@ impl EngineConf {
             fast_sync: false,
             store_data_dir: join_path(&data_dir, "store"),
             state_data_dir: join_path(&data_dir, "state"),
-            ctrkv_data_dir: join_path(&data_dir, "ctrkv"),
             data_dir: data_dir,
         };
 

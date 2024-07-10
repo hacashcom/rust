@@ -2,6 +2,7 @@
 // use std::rc::{Rc, Weak};
 use std::sync::{Arc, Weak, Mutex, RwLock};
 use std::cell::RefCell;
+use std::collections::{ HashMap };
 
 use crate::sys::*;
 use crate::interface;

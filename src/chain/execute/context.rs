@@ -11,6 +11,7 @@ pub struct ExecEnvObj<'a> {
     // outstorer: Option<*mut ExecCaller<'a>>,
     // vm
     vmobj: Option<&'a mut dyn VMIvk>,
+    check_sign_cache: HashMap<Address, Ret<bool>>,
 }
 
 
@@ -30,6 +31,7 @@ impl ExecEnvObj<'_> {
             // extcaller: None,
             // outstorer: None,
             vmobj: None,
+            check_sign_cache: HashMap::new(),
         }
     }
 
@@ -54,14 +56,23 @@ impl ExecContext for ExecEnvObj<'_> {
     fn addr_list(&self) -> &AddrOrList {
         &self.tx.addrlist()
     }
-    fn check_signature(&self, adr: &Address) -> RetErr {
-        transaction::verify_target_signature(adr, self.tx)
-    }
     fn call_depth(&self) -> u32 {
         0
     }
     fn fast_sync(&self) -> bool {
         self.fastsync
+    }
+    fn actions(&self) -> &Vec<Box<dyn Action>> { 
+        self.tx.actions()
+    }
+    
+    fn check_signature(&mut self, adr: &Address) -> Ret<bool> {
+        if self.check_sign_cache.contains_key(adr) {
+            return self.check_sign_cache[adr].clone()
+        }
+        let isok = transaction::verify_target_signature(adr, self.tx);
+        self.check_sign_cache.insert(*adr, isok.clone());
+        isok
     }
     fn vm(&mut self) -> &mut dyn VMIvk {
         *self.vmobj.as_mut().unwrap()
@@ -93,8 +104,8 @@ impl ExecCaller<'_> {
         }
     }
 
-    fn exec(&mut self, act: &dyn Action) -> Ret<(i64, Vec<u8>)> {
-        unsafe { act.execute(&mut *self.ctx, self.bst, self.sto) }
+    fn exec(&mut self, act: &dyn Action, depth: i8) -> Ret<(i64, Vec<u8>)> {
+        unsafe { act.execute(&mut *self.ctx, self.bst, self.sto, depth) }
     }
 
 }
@@ -102,12 +113,12 @@ impl ExecCaller<'_> {
 
 impl ExtActCaller for ExecCaller<'_> {
 
-    fn call(&mut self, kind_and_body: Vec<u8>) -> Ret<(i64, Vec<u8>)> {
+    fn call(&mut self, kind_and_body: Vec<u8>, depth: i8) -> Ret<(i64, Vec<u8>)> {
         let (act, sk) = action::create(&kind_and_body)?;
         if sk != kind_and_body.len() {
             return Err("action data length error".to_owned())
         }
-        self.exec(act.as_ref())
+        self.exec(act.as_ref(), depth)
     }
 }
 

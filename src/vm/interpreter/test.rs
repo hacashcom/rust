@@ -13,7 +13,7 @@ impl TestExtActCaller {
 
 impl ExtActCaller for TestExtActCaller {
 
-    fn call(&mut self, kb: Vec<u8>) -> Result<(i64, Vec<u8>), Error> {
+    fn call(&mut self, kb: Vec<u8>, depth: i8) -> Result<(i64, Vec<u8>), Error> {
         Ok((10, vec![1]))
     }
 

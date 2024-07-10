@@ -25,5 +25,6 @@ include!("test.rs");
 include!("engine.rs");
 include!("vm.rs");
 include!("compile.rs");
+include!("blockdatas.rs");
 
 

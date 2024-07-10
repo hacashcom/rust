@@ -21,7 +21,7 @@ pub fn create(buf: &[u8]) -> Ret<(Box<dyn Transaction>, usize)> {
             Ok((Box::new(trs), mvsk))
         },
     )+
-    _ => Err(format!("Transaction Type <{}> not find.", ty))
+    _ => errf!("Transaction Type <{}> not find.", ty)
     }
 }
 
@@ -64,13 +64,18 @@ impl $class {
     }
 
     fn hash_ex(&self, adfe: Vec<u8>) -> Hash {
-        let stuff = vec![
+        let mut stuff = vec![
             self.ty.serialize(),
             self.timestamp.serialize(),
             self.addrorlist.serialize(),
             adfe, /* self.fee.serialize()*/
             self.actions.serialize()
         ].concat();
+        // ignore signs data
+        if $tyid >= TX_TYPE_3 {
+            stuff.append(&mut self.gas_max.serialize());
+            stuff.append(&mut self.ano_mark.serialize());
+        }
         let hx = x16rs::calculate_hash(stuff);
         Hash::must(&hx[..])
     }
@@ -221,6 +226,19 @@ impl TxExec for $class {
         state.set_txexist(&txhx, &exiobj);
         // sub fee
         let feeadr = self.address()?;
+        if feeadr.version() != ADDRESS_VERSION_PRIVAKEY {
+            return errf!("tx fee address version must be privkey type.")
+        }
+        if self.ty() <= TX_TYPE_3 {
+            if self.ano_mark[0] != 0 {
+                return errf!("tx extend data error")
+            }
+        }
+        if self.ty() <= TX_TYPE_2 {
+            if self.gas_max.value() != 0 {
+                return errf!("tx extend data error")
+            }
+        }
         let amt = self.fee();    
         // println!("tx execute pay fee from {} amount {}", feeadr.readable(), amt.to_fin_string());
         operate::hac_sub(&mut state, &feeadr, amt)?;

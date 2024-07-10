@@ -220,7 +220,7 @@ pub fn execute_code(
                 let mut bdv = ops.peek()?.cast_to_buf();
                 actbody.append(&mut bdv);
             }
-            let (gasu, cres) = extactcaller.call(actbody).map_err(|e|
+            let (gasu, cres) = extactcaller.call(actbody, call_depth as i8).map_err(|e|
                 ItrErr::new(ExtActCallError, &format!("{}", &e)))?;
             gas_added += gasu;
             let resv = StackItem::buf(cres);

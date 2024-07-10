@@ -7,10 +7,13 @@ use crate::core::account::Account;
 
 pub type Address = Fixed21;
 pub const ADDRESS_SIZE: usize = Address::width();
+pub const ADDRESS_VERSION_PRIVAKEY: u8 = 1;
+pub const ADDRESS_VERSION_MULTISIG: u8 = 2;
+pub const ADDRESS_VERSION_CONTRACT: u8 = 3;
 
 // format
 impl Address {
-
+    
     pub fn min() -> Address {
         Fixed21 {
             bytes: [0u8; 21],
@@ -40,6 +43,10 @@ impl Address {
         Account::to_readable(&bts)
     }
     
+    pub fn version(&self) -> u8 {
+        self[0] + 1
+    }
+
 
     
 }

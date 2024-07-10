@@ -16,10 +16,11 @@ pub trait ExecContext {
     fn main_address(&self) -> &Address { panic_never_call_this!() }
     fn addr_list(&self) -> &AddrOrList { panic_never_call_this!() }
     fn tx_fee(&self) -> &Amount { panic_never_call_this!() }
-    fn check_signature(&self, adr: &Address) -> RetErr { errf!("check {} signature error", adr.readable()) }
+    fn check_signature(&mut self, adr: &Address) -> Ret<bool> { errf!("check {} signature error", adr.readable()) }
     // fn address_list(&self) -> &[Address] { &[] }
     fn call_depth(&self) -> u32 { 0 }
     fn fast_sync(&self) -> bool { false }
+    fn actions(&self) -> &Vec<Box<dyn Action>> { panic_never_call_this!() }
     //
     fn vm(&mut self) -> &mut dyn VMIvk { panic_never_call_this!() }
     // fn vm_main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> { panic_never_call_this!() }
@@ -27,7 +28,7 @@ pub trait ExecContext {
 }
 
 pub trait ActExec {
-    fn execute(&self, _: &mut dyn ExecContext, _: &mut dyn State, _: &dyn Store) -> Ret<(i64, Vec<u8>)> { panic_never_call_this!() }
+    fn execute(&self, _: &mut dyn ExecContext, _: &mut dyn State, _: &dyn Store, _: i8) -> Ret<(i64, Vec<u8>)> { panic_never_call_this!() }
 }
 
 pub trait TxExec {

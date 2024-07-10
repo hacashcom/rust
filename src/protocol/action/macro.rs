@@ -19,7 +19,7 @@ pub fn create(buf: &[u8]) -> Ret<(Box<dyn Action>, usize)> {
     }
     match hasact {
         Some(res) => Ok(res),
-        None => Err(format!("Action Kind <{}> not find.", kid))
+        None => errf!("Action Kind <{}> not find.", kid)
     }
 
 }
@@ -99,7 +99,7 @@ impl Action for $actname {
     fn gas(&self) -> i64 {
         $gas
     }
-    fn level(&self) -> u8 {
+    fn level(&self) -> i8 {
         $lv
     }
     fn burn_90(&$p_self) -> bool { 
@@ -111,7 +111,28 @@ impl Action for $actname {
 }
 
 impl ActExec for $actname {
-    fn execute(&$p_self, $p_env: &mut dyn ExecContext, $p_state: &mut dyn State, $p_store: &dyn Store) -> Ret<(i64, Vec<u8>)> {
+    fn execute(&$p_self, $p_env: &mut dyn ExecContext, $p_state: &mut dyn State, $p_store: &dyn Store, depth: i8) -> Ret<(i64, Vec<u8>)> {
+        // check level on depth
+        let acts = $p_env.actions();
+        let act_len = acts.len();
+        let alv = $p_self.level();
+        if alv == ACTLV_TOP_ONLY && act_len != 1 {
+            return errf!("Action just can execute on level ACTLV_TOP_ONLY")
+        } else if alv == ACTLV_TOP_UNIQUE {
+            let mut smalv = 0usize;
+            let mykind = $p_self.kind();
+            for act in acts {
+                if act.kind() == mykind {
+                    smalv += 1;
+                }
+            }
+            if smalv != 1 {
+                return errf!("Action just can execute on level ACTLV_TOP_UNIQUE")
+            }
+        } else if depth > alv {
+            return errf!("Action level {} cannot call on depth {}", alv, depth)
+        }
+        // do exec
         let mut $p_gas = $p_self.gas() as i64; // gas
         let res: Ret<Vec<u8>> = $execblock;
         Ok(($p_gas, res?))

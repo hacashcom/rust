@@ -126,7 +126,7 @@ fn channel_open(this: &ChannelOpen, ctx: &dyn ExecContext, sta: &mut dyn State, 
     channel_close(self, ctx, state, store)
 }
 
-fn channel_close(this: &ChannelClose, ctx: &dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
+fn channel_close(this: &ChannelClose, ctx: &mut dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
 
     let mut state = MintState::wrap(sta);
 

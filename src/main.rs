@@ -65,6 +65,11 @@ fn main() {
     // return;
     // return main_vm_machine_call("56");
     
+    let args: Vec<_> = std::env::args().collect();
+    println!("{:?}", args);
+    if args.len() >= 2 && args[1] == "--reptblk" {
+        return main_test_report_test_block();
+    }
 
     let inicnf = config::load_config();
     // deal datadir

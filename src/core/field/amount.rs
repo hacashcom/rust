@@ -185,7 +185,7 @@ impl Amount {
             }
         }
         if num % 10 == 0 {
-            return Err(format!("Amount.from_mei_i64 `{}` format error.", num))
+            return errf!("Amount.from_mei_i64 `{}` format error.", num)
         }
         // parse
         let big: BigInt = FromPrimitive::from_i64(num).unwrap();
@@ -226,7 +226,7 @@ impl Amount {
 
     pub fn from_mei_string_unsafe(v: &String) -> Result<Amount, String> {
         let mayerr = ||{
-            Err(format!("Amount.from_mei_string_unsafe `{}` format error.", v))
+            errf!("Amount.from_mei_string_unsafe `{}` format error.", v)
         };
         // let mut amt = Amount::default();
         let nums: Vec<&str> = v.as_str().trim().split(".").collect();
@@ -352,7 +352,7 @@ impl Amount {
         }
         let biguse = BigInt::from_str_radix(&numuse, 10);
         if let Err(e) = biguse {
-            return Err(format!("BigInt::from_str_radix error: {} {} {} {}", numstr, numuse, numuse, e.to_string()))
+            return errf!("BigInt::from_str_radix error: {} {} {} {}", numstr, numuse, numuse, e.to_string())
         }
         let biguse = biguse.unwrap();
         let (sign, byte) = biguse.to_bytes_be();
@@ -533,7 +533,7 @@ impl Amount {
             nnn = nnn / 10;
             let unit_n = useamt.unit as u64 + 1;
             if unit_n > 255 {
-                return Err(format!("`{}` compress failed.", self.to_fin_string()));
+                return errf!("`{}` compress failed.", self.to_fin_string());
             }
             useamt.unit = unit_n as u8;
             if upper {

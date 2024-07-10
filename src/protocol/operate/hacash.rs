@@ -5,7 +5,7 @@ macro_rules! fnHacashOperateCommon{
 pub fn $func_name(state: &mut CoreState, $addr: &Address, $amt: &Amount) -> Ret<Amount> {
     
     if ! $amt.is_positive() {
-		return Err(format!("amount {} value is not positive", $amt.to_fin_string()))
+		return errf!("amount {} value is not positive", $amt.to_fin_string())
     }
     let mut userbls = state.balance( $addr ).unwrap_or_default();
     let $oldhac = userbls.hacash;
@@ -37,8 +37,8 @@ fnHacashOperateCommon!(hac_add, addr, amt, oldhac, {
 fnHacashOperateCommon!(hac_sub, addr, amt, oldhac, {  
     // check
     if oldhac < *amt {
-		return Err(format!("do hac_sub error: address {} balance {} not enough, need {}", 
-            addr.readable(), oldhac.to_fin_string(), amt.to_fin_string()))
+		return errf!("do hac_sub error: address {} balance {} not enough, need {}", 
+            addr.readable(), oldhac.to_fin_string(), amt.to_fin_string())
     }
     // do sub
     oldhac.sub( amt ) ?
