@@ -226,7 +226,7 @@ impl TxExec for $class {
         state.set_txexist(&txhx, &exiobj);
         // sub fee
         let feeadr = self.address()?;
-        if feeadr.version() != ADDRESS_VERSION_PRIVAKEY {
+        if feeadr.version() != ADDRVER_PRIVAKEY {
             return errf!("tx fee address version must be privkey type.")
         }
         if self.ty() <= TX_TYPE_3 {

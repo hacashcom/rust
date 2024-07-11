@@ -16,6 +16,19 @@ pub fn address_to_contract(adr: &Address) -> ContractAddress {
 pub type FnSign = [u8; FN_SIGN_WIDTH];
 
 
+pub fn fn_sign_check(f: &[u8; FN_SIGN_WIDTH]) -> RetErr {
+    if f[0] == 0
+    && f[1] == 0
+    && f[2] == 0
+    && f[3] == 0 {
+        return errf!("FnSign({}) format error", hex::encode(f))
+    }
+    Ok(())
+
+}
+
+
+
 macro_rules! unsafe_std_mem_transmute  {
     ($v: expr) => { 
         unsafe { std::mem::transmute($v) }
@@ -58,8 +71,7 @@ pub enum CodeType {
 #[repr(u8)]
 #[derive(Debug, Clone, Copy)]
 pub enum SystemCallType {
-    Upgrade      = 0u8,
-    Append       = 1,
+    Upgrade      = 1u8,
 
     PermitHAC    = 5,
     PermitHACD   = 6,
@@ -73,6 +85,15 @@ pub enum SystemCallType {
     PayableAsset = 18,
     ________a10  = 19,
 
+}
+
+impl SystemCallType {
+    pub fn check(f: u8) -> RetErr {
+        match f {
+            1 | 5..=9 | 15..=19 => Ok(()),
+            _ => errf!("cannot find SystemCallType({})", f),
+        }
+    }
 }
 
 

@@ -74,8 +74,23 @@ impl ExecContext for ExecEnvObj<'_> {
         self.check_sign_cache.insert(*adr, isok.clone());
         isok
     }
-    fn vm(&mut self) -> &mut dyn VMIvk {
-        *self.vmobj.as_mut().unwrap()
+
+    fn vm(&mut self) -> Ret<&mut dyn VMIvk> {
+        match self.vmobj {
+            Some(..) => Ok(*self.vmobj.as_mut().unwrap()),
+            None => errf!("cannot create VM machine")
+        }
+    }
+
+    fn syscall_check_true(&mut self, adr: &Address, f: u8, iptv: Vec<u8>) -> RetErr {
+        if adr.version() != ADDRVER_CONTRACT {
+            return Ok(())
+        }
+        let rtv = self.vm()?.sytm_call(adr, f, iptv)?;
+        if rtv.len()==1 && rtv[0] == 1 {
+            return Ok(()) // true
+        }
+        errf!("contract {} system call <{:?}> return false", adr.readable(), f)
     }
 }
 

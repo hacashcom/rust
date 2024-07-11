@@ -104,6 +104,15 @@ impl $class {
         Ok(())
 	}
 
+	pub fn append(&mut self, mut list: Vec<$value_type>) -> RetErr {
+        if self.$count.to_usize() + list.len() > <$count_type>::max() as usize {
+            return errf!("append size overflow")
+        }
+		self.$count += list.len() as u8;
+        self.$value.append(&mut list);
+        Ok(())
+	}
+
 	pub fn pop(&mut self) -> Option<$value_type> {
         let n = self.$count.to_u64();
         match n {

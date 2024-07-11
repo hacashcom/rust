@@ -12,11 +12,11 @@ StructFieldList!(ContractAddrsssList, count, Uint1, addrs, Address);
 
 // Contract Head
 StructFieldStruct!{ ContractHead, 
-    vrsn: Fixed1
-	marks: Fixed7
+    vrsn: Fixed1 // 2bit4=version, 6bit, 
+	marks: Fixed5
 	inherits: ContractAddrsssList
     librarys: ContractAddrsssList
-	mexts: Fixed1
+	mexts: Fixed2
 }
 
 // Contract System Call

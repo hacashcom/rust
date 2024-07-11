@@ -22,7 +22,8 @@ pub trait ExecContext {
     fn fast_sync(&self) -> bool { false }
     fn actions(&self) -> &Vec<Box<dyn Action>> { panic_never_call_this!() }
     //
-    fn vm(&mut self) -> &mut dyn VMIvk { panic_never_call_this!() }
+    fn vm(&mut self) -> Ret<&mut dyn VMIvk> { panic_never_call_this!() }
+    fn syscall_check_true(&mut self, adr: &Address, f: u8, iptv: Vec<u8>) -> RetErr { panic_never_call_this!() }
     // fn vm_main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> { panic_never_call_this!() }
     // fn exec_act(&mut self) -> Box<dyn ExecResult> { panic_never_call_this!() }
 }

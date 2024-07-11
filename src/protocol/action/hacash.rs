@@ -13,9 +13,9 @@ ActionDefine!{
     false, // burn 90
     [], // req sign
     {
-        let from = ctx.main_address(); 
+        let from = ctx.main_address().clone(); 
         let to = self.to.real(ctx.addr_list())?;
-        hac_transfer(ctx, state, from, &to, &self.amt)
+        hac_transfer(ctx, state, &from, &to, &self.amt)
     }
 }
 
@@ -35,8 +35,8 @@ ActionDefine!{
     [self.from], // req sign
     {
         let from = self.from.real(ctx.addr_list())?;
-        let to = ctx.main_address(); 
-        hac_transfer(ctx, state, &from, to, &self.amt)
+        let to = ctx.main_address().clone(); 
+        hac_transfer(ctx, state, &from, &to, &self.amt)
     }
 }
 

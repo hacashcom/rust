@@ -7,9 +7,9 @@ use crate::core::account::Account;
 
 pub type Address = Fixed21;
 pub const ADDRESS_SIZE: usize = Address::width();
-pub const ADDRESS_VERSION_PRIVAKEY: u8 = 1;
-pub const ADDRESS_VERSION_MULTISIG: u8 = 2;
-pub const ADDRESS_VERSION_CONTRACT: u8 = 3;
+pub const ADDRVER_PRIVAKEY: u8 = 1;
+pub const ADDRVER_MULTISIG: u8 = 2;
+pub const ADDRVER_CONTRACT: u8 = 3;
 
 // format
 impl Address {

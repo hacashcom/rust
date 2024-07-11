@@ -111,13 +111,17 @@ impl Action for $actname {
 }
 
 impl ActExec for $actname {
-    fn execute(&$p_self, $p_env: &mut dyn ExecContext, $p_state: &mut dyn State, $p_store: &dyn Store, depth: i8) -> Ret<(i64, Vec<u8>)> {
+    fn execute(&$p_self, $p_env: &mut dyn ExecContext, 
+        $p_state: &mut dyn State, $p_store: &dyn Store, depth: i8
+    ) -> Ret<(i64, Vec<u8>)> {
         // check level on depth
         let acts = $p_env.actions();
         let act_len = acts.len();
         let alv = $p_self.level();
-        if alv == ACTLV_TOP_ONLY && act_len != 1 {
-            return errf!("Action just can execute on level ACTLV_TOP_ONLY")
+        if alv == ACTLV_TOP_ONLY {
+            if depth > -1 && act_len != 1 {
+                return errf!("Action just can execute on level ACTLV_TOP_ONLY")
+            }
         } else if alv == ACTLV_TOP_UNIQUE {
             let mut smalv = 0usize;
             let mykind = $p_self.kind();
@@ -126,7 +130,7 @@ impl ActExec for $actname {
                     smalv += 1;
                 }
             }
-            if smalv != 1 {
+            if depth > -1 && smalv != 1 {
                 return errf!("Action just can execute on level ACTLV_TOP_UNIQUE")
             }
         } else if depth > alv {

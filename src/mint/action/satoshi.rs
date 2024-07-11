@@ -14,9 +14,9 @@
     [], // req sign
     { 
         let mut state = CoreState::wrap(state);
-        let from = ctx.main_address(); 
+        let from = ctx.main_address().clone(); 
         let to = self.to.real(ctx.addr_list())?;
-        sat_transfer(&mut state, from, &to, &self.satoshi)
+        sat_transfer(ctx, &mut state, &from, &to, &self.satoshi)
     }
 }
 
@@ -40,7 +40,7 @@
         let mut state = CoreState::wrap(state);
         let from = self.from.real(ctx.addr_list())?;
         let to = self.to.real(ctx.addr_list())?;
-        sat_transfer(&mut state, &from, &to, &self.satoshi)
+        sat_transfer(ctx, &mut state, &from, &to, &self.satoshi)
     }
 }
 
@@ -61,7 +61,7 @@
     { 
         let mut state = CoreState::wrap(state);
         let from = self.from.real(ctx.addr_list())?;
-        let to = ctx.main_address();
-        sat_transfer(&mut state, &from, to, &self.satoshi)
+        let to = ctx.main_address().clone();
+        sat_transfer(ctx, &mut state, &from, &to, &self.satoshi)
     }
 }

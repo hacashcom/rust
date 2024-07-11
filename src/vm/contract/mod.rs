@@ -18,11 +18,12 @@ use super::rt::*;
 use super::rt::ItrErrCode::*;
 use super::ir::*;
 
+include!("util.rs");
 include!("type.rs");
 include!("store.rs");
 include!("object.rs");
+include!("upgrade.rs");
 include!("loader.rs");
-include!("util.rs");
 
 
 

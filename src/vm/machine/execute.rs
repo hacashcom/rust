@@ -7,6 +7,7 @@ impl VMIvk for Machine<'_> {
     }
 
     fn sytm_call(&mut self, entry: &Address, fnidx: u8, input: Vec<u8>) -> Ret<Vec<u8>> {
+        SystemCallType::check(fnidx)?;
         let fnty: SystemCallType = unsafe_std_mem_transmute!(fnidx);
         Ok(self.do_sys_call(entry, fnty, input).map_err(|e|e.to_string())?.cast_to_buf())
     }

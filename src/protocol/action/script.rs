@@ -21,7 +21,7 @@
         let codes = [74u8,89];
         // let mut extcaller = vm::interpreter::TestExtActCaller::new();
         // let mut outstorer = vm::interpreter::TestOutStorager::new();
-        ctx.vm().main_call(&addr, &codes)
+        ctx.vm()?.main_call(&addr, &codes)
     }
 }
 

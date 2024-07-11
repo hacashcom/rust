@@ -49,7 +49,9 @@ fnHacashOperateCommon!(hac_sub, addr, amt, oldhac, {
 /****************************/
 
 
-pub fn hac_transfer(ctx: &dyn ExecContext, stadb: &mut dyn State, addr_from: &Address, addr_to: &Address, amt: &Amount) -> Ret<Vec<u8>> {
+pub fn hac_transfer(ctx: &mut dyn ExecContext, stadb: &mut dyn State, 
+    addr_from: &Address, addr_to: &Address, amt: &Amount
+) -> Ret<Vec<u8>> {
 	let mut state = CoreState::wrap(stadb);
     let is_trs_to_my_self = addr_from == addr_to;
     if is_trs_to_my_self {
@@ -59,6 +61,11 @@ pub fn hac_transfer(ctx: &dyn ExecContext, stadb: &mut dyn State, addr_from: &Ad
         }
         return Ok(vec![]);
     }
+    // check contract
+    use vm::rt::SystemCallType::*;
+    let amtv = amt.serialize();
+    ctx.syscall_check_true(addr_from, PermitHAC as u8, amtv.clone())?;
+    ctx.syscall_check_true(addr_to,   PayableHAC as u8, amtv)?;
 	// after 200000 height, the amount transferred to self is not allowed to be greater than the available balance!
     // println!("hac_transfer hac_sub from {} to {} amount {}", addr_from.readable(), addr_to.readable(), amt.to_fin_string());
     hac_sub(&mut state, addr_from, amt)?;
