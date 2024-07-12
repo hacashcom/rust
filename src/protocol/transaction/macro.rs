@@ -147,7 +147,10 @@ impl TransactionRead for $class {
         let mut addrs = HashSet::from([self.address()?]);
         for act in self.actions() {
             for adr in act.req_sign() {
-                addrs.insert(adr.real(self.addrlist())?);
+                let a = adr.real(self.addrlist())?;
+                if a.version() == ADDRVER_PRIVAKEY {
+                    addrs.insert(a); // just PRIVAKEY
+                }
             }
         }
         Ok(addrs)
@@ -227,7 +230,7 @@ impl TxExec for $class {
         // sub fee
         let feeadr = self.address()?;
         if feeadr.version() != ADDRVER_PRIVAKEY {
-            return errf!("tx fee address version must be privkey type.")
+            return errf!("tx fee address version must be PRIVAKEY type.")
         }
         if self.ty() <= TX_TYPE_3 {
             if self.ano_mark[0] != 0 {

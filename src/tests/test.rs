@@ -8,6 +8,12 @@ fn tdat() -> Box<dyn Action> {
 
 pub fn main_test28374659823746892() {
 
+
+    let insv1 = "{p:hpfp,t:LONG,m:10k,do:mint,n:31}".to_owned();
+    let insv2 = "{p:hart,i:hacdfun,m:200,do:bind,n:15,h:fd82b3a0234ba4b3}".to_owned();
+
+    println!("{} {}", insv1.len(), insv2.len());
+
     for i in 0..=255u32 {
         println!("{}: {}", i, i.pow(3)  )
     }

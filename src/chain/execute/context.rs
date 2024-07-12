@@ -67,6 +67,9 @@ impl ExecContext for ExecEnvObj<'_> {
     }
     
     fn check_signature(&mut self, adr: &Address) -> Ret<bool> {
+        if adr.version() != ADDRVER_PRIVAKEY {
+            return errf!("Address {} is not PRIVAKEY type", adr.readable())
+        }
         if self.check_sign_cache.contains_key(adr) {
             return self.check_sign_cache[adr].clone()
         }
@@ -84,12 +87,13 @@ impl ExecContext for ExecEnvObj<'_> {
 
     fn syscall_check_true(&mut self, adr: &Address, f: u8, iptv: Vec<u8>) -> RetErr {
         if adr.version() != ADDRVER_CONTRACT {
-            return Ok(())
+            return Ok(()) // not contract address
         }
         let rtv = self.vm()?.sytm_call(adr, f, iptv)?;
         if rtv.len()==1 && rtv[0] == 1 {
-            return Ok(()) // true
+            return Ok(()) // return true
         }
+        // false
         errf!("contract {} system call <{:?}> return false", adr.readable(), f)
     }
 }

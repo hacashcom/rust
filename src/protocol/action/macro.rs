@@ -119,7 +119,7 @@ impl ActExec for $actname {
         let act_len = acts.len();
         let alv = $p_self.level();
         if alv == ACTLV_TOP_ONLY {
-            if depth > -1 && act_len != 1 {
+            if depth > -1 || act_len != 1 {
                 return errf!("Action just can execute on level ACTLV_TOP_ONLY")
             }
         } else if alv == ACTLV_TOP_UNIQUE {
@@ -130,7 +130,7 @@ impl ActExec for $actname {
                     smalv += 1;
                 }
             }
-            if depth > -1 && smalv != 1 {
+            if depth > -1 || smalv != 1 {
                 return errf!("Action just can execute on level ACTLV_TOP_UNIQUE")
             }
         } else if depth > alv {

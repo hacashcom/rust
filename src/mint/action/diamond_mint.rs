@@ -92,7 +92,7 @@ impl DiamondMint {
  */
 ActionDefineWithStruct!{
     DiamondMint : 4,
-    ACTLV_TOP_ONLY, // level
+    ACTLV_TOP_UNIQUE, // level
     6 + 3 + 32 + 8 + 21 + 32, // gas
     (self, ctx, state, store, gas), // params
     { self.head.number.to_u32() > DIAMOND_ABOVE_NUMBER_OF_BURNING90_PERCENT_TX_FEES }, // burn 90
@@ -106,6 +106,7 @@ ActionDefineWithStruct!{
  * DiamondMint Exec
  */
 fn diamond_mint(this: &DiamondMint, ctx: &dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
+    require_address_version_privkey!(&this.head.address);
 
     let mut state = MintState::wrap(sta);
     let store = MintStoreDisk::wrap(sto);

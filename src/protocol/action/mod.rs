@@ -15,6 +15,7 @@ use crate::protocol::operate::*;
 use crate::vm;
 
 
+include!("util.rs");
 include!("level.rs");
 include!("macro.rs");
 include!("hacash.rs");

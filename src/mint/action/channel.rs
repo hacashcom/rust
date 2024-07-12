@@ -12,7 +12,7 @@
         left_bill      : AddrHac
         right_bill     : AddrHac
     ),
-    ACTLV_TOP_ONLY, // level
+    ACTLV_TOP_UNIQUE, // level
     16 + (21+11)*2, // gas
     (self, ctx, state, store, gas), // params
     false, // burn 90
@@ -24,6 +24,8 @@
 }
 
 fn channel_open(this: &ChannelOpen, ctx: &dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
+    require_address_version_privkey!(&this.left_bill.address);
+    require_address_version_privkey!(&this.right_bill.address);
 
     let (cid, left_addr, left_amt, right_addr, right_amt ) = (
         &this.channel_id,
@@ -118,7 +120,7 @@ fn channel_open(this: &ChannelOpen, ctx: &dyn ExecContext, sta: &mut dyn State, 
     ChannelClose : 3, (
         channel_id     : ChannelId
     ),
-    ACTLV_TOP_ONLY, // level
+    ACTLV_TOP_UNIQUE, // level
     16, // gas
     (self, ctx, state, store, gas), // params
     false, // burn 90
@@ -127,13 +129,16 @@ fn channel_open(this: &ChannelOpen, ctx: &dyn ExecContext, sta: &mut dyn State, 
 }
 
 fn channel_close(this: &ChannelClose, ctx: &mut dyn ExecContext, sta: &mut dyn State, sto: &dyn Store) -> Ret<Vec<u8>> {
-
+    
     let mut state = MintState::wrap(sta);
 
     let cid = &this.channel_id;
     check_vaild_store_item_key("channel", cid, ChannelId::width())?;
     // query
     let chan = must_have!("channel", state.channel(cid));
+    // must privkey address
+    require_address_version_privkey!(&chan.left_bill.address);
+    require_address_version_privkey!(&chan.right_bill.address);
 	// verify two address sign
     ctx.check_signature( &chan.left_bill.address )?;
     ctx.check_signature( &chan.right_bill.address )?;
