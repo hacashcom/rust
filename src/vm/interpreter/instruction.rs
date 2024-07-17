@@ -90,6 +90,21 @@ fn lgc_ge(x: &StackItem, y: &StackItem) -> VmrtRes<StackItem> {
     lgcmatch!(ge, x, y)
 }
 
+fn lgc_and(x: &StackItem, y: &StackItem) -> VmrtRes<StackItem> {
+    let v = match (x.to_bool(), y.to_bool()) {
+        (true, true) => U8(1),// true
+        _ => U8(0), // false
+    };
+    Ok(v)
+}
+
+fn lgc_or(x: &StackItem, y: &StackItem) -> VmrtRes<StackItem> {
+    let v = match (x.to_bool(), y.to_bool()) {
+        (false, false) => U8(0),// false
+        _ => U8(1), // true
+    };
+    Ok(v)
+}
 
 
 /////////////////////// arithmetic ///////////////////////

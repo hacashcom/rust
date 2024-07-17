@@ -16,8 +16,12 @@ macro_rules! do_execute_code {
             $self.gas_extra,
             $self.extn_caller,
             $self.out_storage,
-            $self.local,
             $self.stack,
+            $self.local,
+            $self.heap,
+            $self.memory,
+            $self.global,
+            $self.ctx_addr,
             $self.is_sys_call,
             $self.depth,
         )

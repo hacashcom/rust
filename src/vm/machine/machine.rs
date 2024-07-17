@@ -51,6 +51,8 @@ impl Machine<'_> {
         let gas_table = GasTable::new();
         let gas_extra = GasExtra::new();
         // let call_stacks = CallStack::new();
+        let scmg = space_cap.max_global;
+        let scmm = space_cap.max_memory;
         Machine {
             r: Resoure{
                 code_load,
@@ -58,9 +60,10 @@ impl Machine<'_> {
                 gas_extra,
                 space_cap,
                 // call_stacks,
-                global_vals: KVMap::new(),
-                memory_vals: HashMap::new(),
+                global_vals: KVMap::new(scmg),
+                memory_vals: AddrKVMap::new(scmm),
                 contract_count: HashSet::new(),
+                frame_pools: Vec::new(),
             },
             gas_limit,
             extn_caller,

@@ -12,7 +12,7 @@
         left_bill      : AddrHac
         right_bill     : AddrHac
     ),
-    ACTLV_TOP_UNIQUE, // level
+    ACTLV_TOP, // level
     16 + (21+11)*2, // gas
     (self, ctx, state, store, gas), // params
     false, // burn 90
@@ -120,7 +120,7 @@ fn channel_open(this: &ChannelOpen, ctx: &dyn ExecContext, sta: &mut dyn State, 
     ChannelClose : 3, (
         channel_id     : ChannelId
     ),
-    ACTLV_TOP_UNIQUE, // level
+    ACTLV_TOP, // level
     16, // gas
     (self, ctx, state, store, gas), // params
     false, // burn 90

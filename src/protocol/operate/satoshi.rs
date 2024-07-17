@@ -53,7 +53,7 @@ pub fn sat_transfer(ctx: &mut dyn ExecContext, state: &mut CoreState,
     // check contract
     use vm::rt::SystemCallType::*;
     let amtv = sat.value().to_be_bytes().to_vec();
-    ctx.syscall_check_true(addr_from, PermitSAT as u8, amtv.clone())?;
+    ctx.syscall_check_true(addr_from, PermitSAT  as u8, amtv.clone())?;
     ctx.syscall_check_true(addr_to,   PayableSAT as u8, amtv)?;
     // do transfer
     sat_sub(state, addr_from, sat)?;

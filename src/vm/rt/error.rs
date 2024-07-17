@@ -34,6 +34,7 @@ pub enum ItrErrCode {
     CallExitInvalid  = 33,
     
     CastFail = 36,
+    BufferOpFail = 37,
     
     Arithmetic = 41,
     BufferHandle = 42,
@@ -87,5 +88,12 @@ macro_rules! itr_err_code {
 macro_rules! itr_err_fmt {
     ($code: expr, $( $v: expr),+ ) => {
         Err(ItrErr::new($code, &format!($( $v ),+)))
+    }
+}
+
+#[macro_export] 
+macro_rules! cannot_cast_err {
+    ($v: expr, $ty: expr) => {
+        itr_err_fmt!(CastFail, "cannot cast {:?} to {}", $v, $ty)
     }
 }

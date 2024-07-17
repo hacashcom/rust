@@ -27,19 +27,13 @@ impl StackItem {
         Buffer(b)
     }
 
-    pub fn val_size(&self) -> usize {
-        match self {
-            Nil => 0,
-            U8(_) => 1,
-            U16(_) => 2,
-            U32(_) => 4,
-            U64(_) => 8,
-            U128(_) => 16,
-            // U256(_) => 32,
-            Buffer(b) => b.len(),
-            _ => 0, 
-        }
-    }
+}
+
+
+
+/*********** debug ***********/
+
+impl StackItem {
 
     pub fn print_string(&self) -> String {
         match self {

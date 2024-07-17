@@ -26,15 +26,11 @@ impl CallStack {
         self.frames.push(frame);
         Ok(())
     }
-    
-    /*
-    pub fn make(&mut self, mode: CallMode, codes: Vec<u8>, input: StackItem) -> Frame {
-        let deep = self.frames.len();
-        let frame = Frame::new(mode, deep, codes, input);
-        frame
-    } 
-    */ 
 
+    pub fn unpkg(self) -> Vec<Frame> {
+        self.frames
+    }
+    
 
 
 

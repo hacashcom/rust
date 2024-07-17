@@ -1,12 +1,17 @@
 
+use std::collections::{ HashMap };
 
 
-pub mod stack;
-pub mod local;
-pub mod heap;
-pub mod memory;
-pub mod global;
-pub mod storage;
+use crate::sys::*;
 
+use super::rt::*;
+use super::rt::ItrErrCode::*;
+use super::value::*;
+
+
+
+include!("stack.rs");
+include!("kvmap.rs");
+include!("heap.rs");
 
 

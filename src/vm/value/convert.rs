@@ -32,21 +32,3 @@ fn buf_to_uint(buf: &[u8]) -> VmrtRes<StackItem> {
 
 
 
-
-impl StackItem {
-
-    pub fn cast_to_buf(&self) -> Vec<u8> {
-        match &self {
-            Nil => vec![],
-            U8(n) =>   n.to_be_bytes().into(),
-            U16(n) =>  n.to_be_bytes().into(),
-            U32(n) =>  n.to_be_bytes().into(),
-            U64(n) =>  n.to_be_bytes().into(),
-            U128(n) => n.to_be_bytes().into(),
-            Buffer(buf) => buf.clone(),
-        }
-    }
-
-
-}
-

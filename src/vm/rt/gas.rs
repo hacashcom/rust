@@ -11,9 +11,18 @@ impl GasTable {
         // 1
         for i in [
             CASTU8, CASTU16, CASTU32, CASTU64, CASTU128, CASTBUF,
-        ] {
-            gtb[i as usize] = 1;
-        }
+            PUSH0, PUSH1, PUSHU8, PUSHU16, POP, DUP, TYPE, SIZE, BYTE, 
+            NOT, NOP, RET, ABT, END, NT, JMPL, JMPS, JMPSL,  
+        ] { gtb[i as usize] = 1; }
+        // 3
+        for i in [
+            MUL, DIV, MOD
+        ] { gtb[i as usize] = 3; }
+        // 4
+        for i in [
+            POW,
+            PUT /*locals put*/, 
+        ] { gtb[i as usize] = 4; }
         // ok
         GasTable(gtb)
     }

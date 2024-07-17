@@ -13,7 +13,7 @@ use crate::interface::vm::*;
 pub mod rt;
 pub mod ir;
 pub mod value;
-pub mod stack;
+pub mod space;
 pub mod frame;
 pub mod interpreter;
 pub mod native;

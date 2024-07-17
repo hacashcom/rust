@@ -13,7 +13,7 @@ use super::rt::CallExit::*;
 use super::rt::ItrErrCode::*;
 use super::ir::*;
 use super::value::*;
-use super::stack::*;
+use super::space::*;
 use super::frame::*;
 use super::contract::*;
 

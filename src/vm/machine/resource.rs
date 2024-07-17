@@ -1,16 +1,16 @@
 
 
 
-
-
 pub struct Resoure {
     pub code_load: Arc<Mutex<ContractLoader>>,
     pub gas_table: GasTable,
     pub gas_extra: GasExtra,
     pub space_cap: SpaceCap,
+    pub memory_vals: AddrKVMap,
     pub global_vals: KVMap,
-    pub memory_vals: HashMap<ContractAddress, KVMap>,
     pub contract_count: HashSet<ContractAddress>,
+    // space cache
+    pub frame_pools: Vec<Frame>,
 }
 
 
@@ -33,6 +33,22 @@ impl Machine<'_> {
         self.r
     }
 
+    pub fn reclaim_frame(&mut self, f: Frame) {
+        self.r.frame_pools.push(f);
+    }
+
+    pub fn reclaim_frames(&mut self, fs: Vec<Frame>) {
+        for f in fs {
+            self.reclaim_frame(f);
+        }
+    }
+
+    pub fn fetch_frame(&mut self) -> Frame {
+        match self.r.frame_pools.pop() {
+            Some(f) => f,
+            _ => Frame::default(),
+        }
+    }
 
 
 }

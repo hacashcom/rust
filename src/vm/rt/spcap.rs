@@ -10,8 +10,8 @@ pub struct SpaceCap {
 
     pub max_heap_seg: usize, // 256 * 64 = 16kb
 
-    pub max_global: usize, // 32
-    pub max_memory: usize, // 12
+    pub max_global: usize, // 20
+    pub max_memory: usize, // 16
 
     pub max_ctl_func: usize, // 200 cache
     pub max_ctl_libx: usize, // 100 cache
@@ -30,8 +30,8 @@ impl SpaceCap {
             total_stack:       256,
             total_local:       256,
             max_heap_seg:      64,
-            max_global:        32,
-            max_memory:        12,
+            max_global:        20,
+            max_memory:        16,
             max_ctl_func:      200,
             max_ctl_libx:      100,
             max_ctl_body:      50,

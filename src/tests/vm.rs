@@ -4,6 +4,7 @@ use crate::vm;
 use crate::vm::*;
 use crate::vm::rt::*;
 use crate::vm::value::*;
+use crate::vm::space::*;
 use crate::vm::interpreter::*;
 use crate::interface::vm::*;
 
@@ -61,14 +62,16 @@ pub fn main_vm_frame_call_2834756283974() {
     let adr1 = [1u8; 21];
     let adr2 = [1u8; 21];
     let iptv = StackItem::empty_buf();
-    let mut frame = vm::frame::Frame::new(adr1, adr2,
+    let mut frame = vm::frame::Frame::new(&SpaceCap::new(), None, adr1, adr2,
         CallMode::External, 0, codes, iptv);
     // do call
     let now = Instant::now();
     let mut extcaller = vm::interpreter::TestExtActCaller::new();
     let mut outstorer = vm::interpreter::TestOutStorager::new();
-    let res = frame.exec(
-        &mut gas, &GasTable::new(), &GasExtra::new(), &mut extcaller, &mut outstorer, false,
+    let res = frame.unwrap().exec(
+        &mut gas, &GasTable::new(), &GasExtra::new(), 
+        &mut extcaller, &mut outstorer, 
+        &mut AddrKVMap::new(20), &mut KVMap::new(20), false,
     ).call();
     println!("benchmark run time = {:?}", Instant::now().duration_since(now));
 
@@ -86,21 +89,23 @@ pub fn main_vm_execute_89234765982374() {
 
     let gas_limit = 1576i64;
     let mut gas_usable = gas_limit;
-    let mut operand_stack = stack::Stack::new(256);
-    let mut locals = stack::Stack::new(256);
+    let mut operand_stack = space::Stack::new(256);
+    let mut locals = space::Stack::new(256);
 
     let now = Instant::now();
     
     let mut lpnm: isize = 1;
     let mut res;
     loop {
+        let ctxadr = new_contract_address();
         let mode = CallMode::External;
         let mut pc: usize = 0;
         let mut extcaller = vm::interpreter::TestExtActCaller::new();
         let mut outstorer = vm::interpreter::TestOutStorager::new();
         res = vm::interpreter::execute_code(&codes, &mut pc, &mode, 
             &mut gas_usable, &gas_table, &gas_extra, &mut extcaller, &mut outstorer,
-            &mut locals, &mut operand_stack, false, 0);
+            &mut operand_stack, &mut locals, &mut Heap::new(64),
+            &mut AddrKVMap::new(20), &mut KVMap::new(20), &ctxadr, false, 0);
         lpnm -= 1;
         if lpnm <= 0 { break }
     }

@@ -50,7 +50,7 @@ pub fn hacd_transfer(ctx: &mut dyn ExecContext, state: &mut CoreState,
     // check contract
     use vm::rt::SystemCallType::*;
     let amtv = dlist.form(); // name bytes vec
-    ctx.syscall_check_true(addr_from, PermitHACD as u8, amtv.clone())?;
+    ctx.syscall_check_true(addr_from, PermitHACD  as u8, amtv.clone())?;
     ctx.syscall_check_true(addr_to,   PayableHACD as u8, amtv)?;
     // do transfer
     hacd_sub(state, addr_from, hacd)?;

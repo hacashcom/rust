@@ -29,6 +29,10 @@ pub enum CallMode {
     Code,
 }
 
+impl Default for CallMode {
+    fn default() -> Self { CallMode::Main }
+}
+
 
 #[derive(Debug, Clone)]
 pub struct Funcptr {

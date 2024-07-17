@@ -87,7 +87,7 @@ impl ExecContext for ExecEnvObj<'_> {
 
     fn syscall_check_true(&mut self, adr: &Address, f: u8, iptv: Vec<u8>) -> RetErr {
         if adr.version() != ADDRVER_CONTRACT {
-            return Ok(()) // not contract address
+            return Ok(()) // not contract address, ingore
         }
         let rtv = self.vm()?.sytm_call(adr, f, iptv)?;
         if rtv.len()==1 && rtv[0] == 1 {

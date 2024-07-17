@@ -173,9 +173,13 @@ pub fn execute_code(
     extactcaller: &mut dyn ExtActCaller,
     outstorager: &mut dyn OutStorager,
 
-    locals: &mut Stack,
     operand_stack: &mut Stack,
+    locals: &mut Stack,
+    heap:  &mut Heap,
+    memory: &mut AddrKVMap,
+    global: &mut KVMap,
 
+    ctx_addr: &ContractAddress,
     is_sys_call: bool,
     call_depth: usize,
 
@@ -199,6 +203,11 @@ pub fn execute_code(
     macro_rules! pbuf { () => { itrparambuf!(codes, *pc, tail) } }
     macro_rules! pbufl { () => { itrparambufl!(codes, *pc, tail) } }
     macro_rules! pcutbuf { ($w: expr) => { itrbuf!(codes, *pc, tail, $w) } }
+    macro_rules! peekset { ($f: ident) => { ops.peek()?.$f()? } }
+    macro_rules! peeksetp1 { ($f: ident) => { { let p1=ops.pop()?; ops.peek()?.$f(p1)? } } }
+    macro_rules! peeksetp2 { ($f: ident) => { 
+        { let p1=ops.pop()?; let p2=ops.pop()?; ops.peek()?.$f(p2, p1)? } 
+    } }
 
     // start run
     loop {
@@ -217,7 +226,7 @@ pub fn execute_code(
         macro_rules! extcall { ($ifv: expr) => { 
             let mut actbody = vec![instbyte, pu8!()];
             if $ifv {
-                let mut bdv = ops.peek()?.cast_to_buf();
+                let mut bdv = ops.peek()?.to_buf();
                 actbody.append(&mut bdv);
             }
             let (gasu, cres) = extactcaller.call(actbody, call_depth as i8).map_err(|e|
@@ -242,7 +251,7 @@ pub fn execute_code(
             EXTFUNC    => { extcall!(true); },
             EXTENV     => { extcall!(false); },
             // native call
-            NATIVECALL => { *ops.peek()? = (native_call(pu8!(), ops.peek()?)?) }
+            NATIVECALL => { let pk=ops.peek()?; *pk = (native_call(pu8!(), pk)?) }
             NATIVEENV => ops.push( native_env(pu8!())? )?,
             // constant
             PUSH0    => ops.push(StackItem::U8(0))?,
@@ -254,25 +263,38 @@ pub fn execute_code(
             PUSHBUFL => ops.push(pbufl!())?, // buf long
             DUP  =>  ops.push(ops.last()?)?,
             POP  => { ops.pop()?; }, // drop
+            CAT  => peeksetp1!(opbuf_cat),
             SWAP => ops.swap()?,
+            // buf
+            CUT => peeksetp2!(opbuf_cut),
+            BYTE => peeksetp1!(opbuf_byte),
+            TYPE => peekset!(cast_type_id),
+            SIZE => peekset!(cast_size_num),
             // locals
             ALLOC => {
-                let num = pu8!();
+                let num = pu8!();   
                 gas_added += num as i64 * gas_extra.resource_local_item; // resource fee
                 locals.alloc(num)?;
             },
             PUT => locals.save(ops.pop()?, pu8!() as u16)?,
             GET => ops.push(locals.load(pu8!() as u16)?)?,
+            // global & memory
+            // GPUT => 
+            // GGET =>
+            // MPUT => 
+            // MGET =>
             // cast
-            CASTU8   => ops.peek()?.cast_u8()?,
-            CASTU16  => ops.peek()?.cast_u16()?,
-            CASTU32  => ops.peek()?.cast_u32()?,
-            CASTU64  => ops.peek()?.cast_u64()?,
-            CASTU128 => ops.peek()?.cast_u128()?,
-            /*CASTU256 => ops.peek()?.cast_u256()?,*/
-            CASTBUF  => ops.peek()?.cast_buf()?,
+            CASTU8   => peekset!(cast_u8),
+            CASTU16  => peekset!(cast_u16),
+            CASTU32  => peekset!(cast_u32),
+            CASTU64  => peekset!(cast_u64),
+            CASTU128 => peekset!(cast_u128),
+            /*CASTU256 => peekset!(cast_u256),*/
+            CASTBUF  => peekset!(cast_buf),
             // logic
-            NOT => ops.peek()?.cast_bool_not()?,
+            AND => binop_btw(ops, lgc_and)?,
+            OR =>  binop_btw(ops, lgc_or)?,
+            NOT => peekset!(cast_bool_not),
             EQ  => binop_btw(ops, lgc_equal)?,
             NEQ => binop_btw(ops, lgc_not_equal)?,
             LT  => binop_btw(ops, lgc_lt)?,
@@ -286,6 +308,8 @@ pub fn execute_code(
             DIV => binop_arithmetic(ops, div_checked)?,
             MOD => binop_arithmetic(ops, mod_checked)?,
             POW => binop_arithmetic(ops, pow_checked)?,
+            INC => { ops.push(StackItem::U8(1)); binop_arithmetic(ops, add_checked)? },
+            DEC => { ops.push(StackItem::U8(1)); binop_arithmetic(ops, sub_checked)? },
             // workflow control
             JMPL  =>        jump!(codes, *pc, tail, 2),
             JMPS  =>     ostjump!(codes, *pc, tail, 1),

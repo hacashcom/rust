@@ -3,13 +3,13 @@
 impl VMIvk for Machine<'_> {
     
     fn main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> {
-        Ok(self.do_main_call(entry, irs).map_err(|e|e.to_string())?.cast_to_buf())
+        Ok(self.do_main_call(entry, irs).map_err(|e|e.to_string())?.to_buf())
     }
 
     fn sytm_call(&mut self, entry: &Address, fnidx: u8, input: Vec<u8>) -> Ret<Vec<u8>> {
         SystemCallType::check(fnidx)?;
         let fnty: SystemCallType = unsafe_std_mem_transmute!(fnidx);
-        Ok(self.do_sys_call(entry, fnty, input).map_err(|e|e.to_string())?.cast_to_buf())
+        Ok(self.do_sys_call(entry, fnty, input).map_err(|e|e.to_string())?.to_buf())
     }
 
 }
@@ -50,18 +50,28 @@ impl Machine<'_> {
         }
 
         let mut retval = StackItem::nil(); 
-        let mut current_frame = Frame::new(entry.clone(), entry, call_mode, 0usize, codes, input);
+
+        let mut current_frame = self.fetch_frame();
+        current_frame.init(&self.r.space_cap, None, entry.clone(), entry, call_mode, 0usize, codes, input)?;
         let mut call_stacks = CallStack::new();
 
+        macro_rules! defer_reclaim_frame {
+            () => {
+                self.reclaim_frame(current_frame);
+                self.reclaim_frames(call_stacks.unpkg());
+            }
+        }
 
         macro_rules! create_frame_exec {
             () => {
                 current_frame.exec(
                     &mut self.gas_limit,
-                    &self.r.gas_table,
-                    &self.r.gas_extra,
+                    &mut self.r.gas_table,
+                    &mut self.r.gas_extra,
                     self.extn_caller,
                     self.out_storage,
+                    &mut self.r.memory_vals,
+                    &mut self.r.global_vals,
                     is_sys_call,
                 )
             }
@@ -80,6 +90,7 @@ impl Machine<'_> {
             // abort
             if let Abort = result {
                 let err = current_frame.stack.pop()?.print_string();
+                defer_reclaim_frame!();
                 return itr_err_fmt!(ThrowAbort, "Abort: {}", err)
             }
 
@@ -96,9 +107,9 @@ impl Machine<'_> {
                         break // all call finish
                     },
                     Some(frame) => {
-                        // return prev func to continue
+                        // prev func to continue
                         current_frame = frame;
-                        current_frame.stack.push(retval.clone())?; // put func return value
+                        current_frame.stack.push(retval.clone())?; // put func ret value
                         continue // continue to run prev frame codes
                     },
                 };
@@ -106,12 +117,14 @@ impl Machine<'_> {
 
             // call func
             let Call(ref funcptr) = result else {
+                defer_reclaim_frame!();
                 return itr_err_code!(CallExitInvalid)
             };
 
             // check
             if is_sys_call && External == funcptr.mode {
                 // system func cannot do External call
+                defer_reclaim_frame!();
                 return itr_err_fmt!(CallInvalid, "Sys call mode invalid call: {:?}", funcptr)
             }
 
@@ -134,6 +147,7 @@ impl Machine<'_> {
                 let mut frame_exec = create_frame_exec!();
                 let res = frame_exec.call_code(&load_codes, &mut pc)?;
                 let (Tailend | Finish) = res else {
+                    defer_reclaim_frame!();
                     return itr_err_fmt!(CallExitInvalid, 
                         "Call code mode cannot finish by {:?}", res)
                 };
@@ -145,10 +159,10 @@ impl Machine<'_> {
             if let External | InheritLoc | Library | Static = funcptr.mode {
                 // save prev frame
                 let fnargv = current_frame.stack.pop()?; // func argv
-                call_stacks.push(current_frame)?;
                 // create frame
                 let next_depth = call_stacks.len();
                 if next_depth >= max_call_depth {
+                    defer_reclaim_frame!();
                     return itr_err_code!(OutOfCallDepth)
                 }
                 if External == funcptr.mode {
@@ -156,17 +170,22 @@ impl Machine<'_> {
                         next_ctx_addr = adr.clone();
                     }
                 }
-                let mut next_frame = Frame::new(next_ivk_addr, next_ctx_addr, 
-                    funcptr.mode, next_depth, load_codes.to_vec(), fnargv);
+                let mut next_frame = self.fetch_frame();
+                next_frame.init(&self.r.space_cap, Some(&current_frame), next_ivk_addr, next_ctx_addr, 
+                    funcptr.mode, next_depth, load_codes.to_vec(), fnargv)?;
+                // save prev
+                call_stacks.push(current_frame)?;
                 current_frame = next_frame;
                 continue
             }
 
             // some error
+            defer_reclaim_frame!();
             return itr_err_fmt!(CallInvalid, "Invalid call: {:?}", funcptr)
         }
 
         // all call finished, function return
+        defer_reclaim_frame!();
         return Ok(retval)
 
     }

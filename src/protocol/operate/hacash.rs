@@ -64,7 +64,7 @@ pub fn hac_transfer(ctx: &mut dyn ExecContext, stadb: &mut dyn State,
     // check contract
     use vm::rt::SystemCallType::*;
     let amtv = amt.serialize();
-    ctx.syscall_check_true(addr_from, PermitHAC as u8, amtv.clone())?;
+    ctx.syscall_check_true(addr_from, PermitHAC  as u8, amtv.clone())?;
     ctx.syscall_check_true(addr_to,   PayableHAC as u8, amtv)?;
 	// after 200000 height, the amount transferred to self is not allowed to be greater than the available balance!
     // println!("hac_transfer hac_sub from {} to {} amount {}", addr_from.readable(), addr_to.readable(), amt.to_fin_string());
