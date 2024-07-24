@@ -84,7 +84,7 @@ fn exec_tx_actions_withvm(is_fast_sync: bool,
     let t1 = unsafe{ &mut *callptr };
     let t2 = unsafe{ &mut *callptr };
     let t3 = unsafe{ &mut *callptr };
-    let mut machine = vm::boot_vm( gas_limit, t1, t2, t3);
+    let mut machine = vm::boot_vm( pending_height, gas_limit, t1, t2, t3);
     // set ctx
     let vmptr: *mut vm::machine::Machine = &mut machine;
     ctx.vmobj = Some( unsafe{ &mut *vmptr });

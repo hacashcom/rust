@@ -159,7 +159,7 @@ macro_rules! funcptr {
 /**
 * execute code
 */
-pub fn execute_code(
+pub fn execute_code_of_call(
 
     codes: &[u8], // max len = 65536
     pc: &mut usize, // pc
@@ -169,6 +169,7 @@ pub fn execute_code(
 
     gas_table: &GasTable, // len = 256
     gas_extra: &GasExtra,
+    space_cap: &SpaceCap,
 
     extactcaller: &mut dyn ExtActCaller,
     outstorager: &mut dyn OutStorager,
@@ -180,8 +181,10 @@ pub fn execute_code(
     global: &mut KVMap,
 
     ctx_addr: &ContractAddress,
+
     is_sys_call: bool,
     call_depth: usize,
+    height: u64, // pedding block height
 
 ) -> VmrtRes<CallExit> {
 
@@ -202,11 +205,14 @@ pub fn execute_code(
     macro_rules! pu16 { () => { itrparamu16!(codes, *pc, tail) } }
     macro_rules! pbuf { () => { itrparambuf!(codes, *pc, tail) } }
     macro_rules! pbufl { () => { itrparambufl!(codes, *pc, tail) } }
+    macro_rules! pk { () => { ops.peek()? } }
+    macro_rules! pv { () => { ops.pop()? } }
+    macro_rules! pvr { () => { &pv!() } }
     macro_rules! pcutbuf { ($w: expr) => { itrbuf!(codes, *pc, tail, $w) } }
-    macro_rules! peekset { ($f: ident) => { ops.peek()?.$f()? } }
-    macro_rules! peeksetp1 { ($f: ident) => { { let p1=ops.pop()?; ops.peek()?.$f(p1)? } } }
+    macro_rules! peekset { ($f: ident) => { pk!().$f()? } }
+    macro_rules! peeksetp1 { ($f: ident) => { { let p1=pv!(); pk!().$f(p1)? } } }
     macro_rules! peeksetp2 { ($f: ident) => { 
-        { let p1=ops.pop()?; let p2=ops.pop()?; ops.peek()?.$f(p2, p1)? } 
+        { let p1=pv!(); let p2=pv!(); pk!().$f(p2, p1)? } 
     } }
 
     // start run
@@ -221,24 +227,28 @@ pub fn execute_code(
         *pc += 1; // next
 
         // do execute
-        let mut gas_added = 0i64;
+        let mut gsd = 0i64; // gas added
 
         macro_rules! extcall { ($ifv: expr) => { 
             let mut actbody = vec![instbyte, pu8!()];
             if $ifv {
-                let mut bdv = ops.peek()?.to_buf();
+                let mut bdv = pk!().to_buf()?;
                 actbody.append(&mut bdv);
             }
             let (gasu, cres) = extactcaller.call(actbody, call_depth as i8).map_err(|e|
                 ItrErr::new(ExtActCallError, &format!("{}", &e)))?;
-            gas_added += gasu;
+            gsd += gasu;
             let resv = StackItem::buf(cres);
             if $ifv {
-                *ops.peek()? = resv;
+                *pk!() = resv;
             } else {
                 ops.push( resv );
             }
         }}
+
+        macro_rules! stowrap { () => { 
+            Storage::wrap(height, pv!(), ctx_addr, outstorager, space_cap)
+        } }
 
         match instruction {
             // ext action
@@ -251,7 +261,7 @@ pub fn execute_code(
             EXTFUNC    => { extcall!(true); },
             EXTENV     => { extcall!(false); },
             // native call
-            NATIVECALL => { let pk=ops.peek()?; *pk = (native_call(pu8!(), pk)?) }
+            NATIVECALL => { let pk=pk!(); *pk = (native_call(pu8!(), pk)?) }
             NATIVEENV => ops.push( native_env(pu8!())? )?,
             // constant
             PUSH0    => ops.push(StackItem::U8(0))?,
@@ -262,27 +272,39 @@ pub fn execute_code(
             PUSHBUF  => ops.push(pbuf!())?,
             PUSHBUFL => ops.push(pbufl!())?, // buf long
             DUP  =>  ops.push(ops.last()?)?,
-            POP  => { ops.pop()?; }, // drop
+            POP  => { pv!(); }, // drop
             CAT  => peeksetp1!(opbuf_cat),
             SWAP => ops.swap()?,
             // buf
-            CUT => peeksetp2!(opbuf_cut),
+            CUT  => peeksetp2!(opbuf_cut),
             BYTE => peeksetp1!(opbuf_byte),
             TYPE => peekset!(cast_type_id),
             SIZE => peekset!(cast_size_num),
             // locals
             ALLOC => {
                 let num = pu8!();   
-                gas_added += num as i64 * gas_extra.resource_local_item; // resource fee
+                gsd += num as i64 * gas_extra.resource_local_item; // resource fee
                 locals.alloc(num)?;
             },
-            PUT => locals.save(ops.pop()?, pu8!() as u16)?,
+            PUT => locals.save(pv!(), pu8!() as u16)?,
             GET => ops.push(locals.load(pu8!() as u16)?)?,
-            // global & memory
-            // GPUT => 
-            // GGET =>
-            // MPUT => 
-            // MGET =>
+            // heap & memory & global & storage
+            HGROW    => gsd += heap.grow( pu8!() )?,
+            HREAD    => *pk!() = heap.read( pvr!(), pk!() )?,
+            HREADU   => ops.push( heap.readu(  pu8!() )? )?,
+            HREADUL  => ops.push( heap.readul( pu16!() )? )?,
+            HWRITE   => heap.write(   pvr!(), pvr!() )?,
+            HWRITEX  => heap.writex(  pu8!(),      pvr!() )?,
+            HWRITEXL => heap.writexl( pu16!(),     pvr!() )?,
+            GPUT => global.put(pvr!(), pv!())?,
+            GGET => *pk!() = global.get(pk!())?,
+            MPUT => memory.entry(*ctx_addr).put(pvr!(), pv!())?,
+            MGET => *pk!() = memory.entry(*ctx_addr).get(pk!())?,
+            SRENT => gsd += stowrap!().rent_time( pu16!() )?,
+            SSAVE => gsd += stowrap!().save( pvr!() )?,
+            SLOAD => { let sv = stowrap!().load()?; 
+                ops.push(sv.0)?/*expired*/; 
+                ops.push(sv.1)?/*value*/ },
             // cast
             CASTU8   => peekset!(cast_u8),
             CASTU16  => peekset!(cast_u16),
@@ -321,7 +343,7 @@ pub fn execute_code(
             // other
             NT  => return itr_err_code!(InstNeverTouch), // never touch
             NOP => {}, // do nothing
-            BURN => gas_added += pu16!() as i64,         
+            BURN => gsd += pu16!() as i64,         
             // exit
             RET => return Ok(Return), // function return
             ABT => return Ok(Abort), // end with error
@@ -344,7 +366,7 @@ pub fn execute_code(
         }
 
         // reduce gas for use
-        *gas_usable -= gas_table.gas(instbyte) + gas_added;
+        *gas_usable -= gas_table.gas(instbyte) + gsd;
         // check gas
         if *gas_usable < 0 {
             return itr_err_code!(OutOfGas) // out of gas

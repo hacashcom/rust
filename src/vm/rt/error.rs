@@ -22,12 +22,14 @@ pub enum ItrErrCode {
     OutOfCallDepth = 17,
     OutOfLoadContract = 18,
     
-    GasError    = 21,
-    StackError  = 22,
-    LocalError  = 23,
-    HeapError   = 24,
-    MemoryError = 25,
-    GlobalError = 26,
+    GasError     = 21,
+    StackError   = 22,
+    LocalError   = 23,
+    HeapError    = 24,
+    MemoryError  = 25,
+    GlobalError  = 26,
+    StorageError = 27,
+    KVStoreError = 28,
     
     CallNotExist = 31,
     CallInvalid  = 32,
@@ -44,7 +46,14 @@ pub enum ItrErrCode {
     OutStorageError = 55,
 
     ThrowAbort = 101, // user code call
+
+    UnknownError = 255,
 }
+
+impl Default for ItrErrCode {
+    fn default() -> Self { ItrErrCode::UnknownError }
+}
+
 
 #[derive(Debug)]
 pub struct ItrErr(pub ItrErrCode, pub String);
@@ -62,6 +71,12 @@ impl ItrErr {
     }
     pub fn code(n: ItrErrCode) -> ItrErr {
         ItrErr(n, "".to_string())
+    }
+}
+
+impl From<ItrErr> for Error {
+    fn from(e: ItrErr) -> Self {
+        e.to_string()
     }
 }
 

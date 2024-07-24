@@ -3,13 +3,13 @@
 impl VMIvk for Machine<'_> {
     
     fn main_call(&mut self, entry: &Address, irs: &[u8]) -> Ret<Vec<u8>> {
-        Ok(self.do_main_call(entry, irs).map_err(|e|e.to_string())?.to_buf())
+        Ok(self.do_main_call(entry, irs)?.to_buf()?)
     }
 
     fn sytm_call(&mut self, entry: &Address, fnidx: u8, input: Vec<u8>) -> Ret<Vec<u8>> {
         SystemCallType::check(fnidx)?;
         let fnty: SystemCallType = unsafe_std_mem_transmute!(fnidx);
-        Ok(self.do_sys_call(entry, fnty, input).map_err(|e|e.to_string())?.to_buf())
+        Ok(self.do_sys_call(entry, fnty, input)?.to_buf()?)
     }
 
 }
@@ -51,7 +51,7 @@ impl Machine<'_> {
 
         let mut retval = StackItem::nil(); 
 
-        let mut current_frame = self.fetch_frame();
+        let mut current_frame = self.alloc_frame();
         current_frame.init(&self.r.space_cap, None, entry.clone(), entry, call_mode, 0usize, codes, input)?;
         let mut call_stacks = CallStack::new();
 
@@ -68,11 +68,13 @@ impl Machine<'_> {
                     &mut self.gas_limit,
                     &mut self.r.gas_table,
                     &mut self.r.gas_extra,
+                    &mut self.r.space_cap,
                     self.extn_caller,
                     self.out_storage,
                     &mut self.r.memory_vals,
                     &mut self.r.global_vals,
                     is_sys_call,
+                    self.pending_height,
                 )
             }
         }
@@ -170,7 +172,7 @@ impl Machine<'_> {
                         next_ctx_addr = adr.clone();
                     }
                 }
-                let mut next_frame = self.fetch_frame();
+                let mut next_frame = self.alloc_frame();
                 next_frame.init(&self.r.space_cap, Some(&current_frame), next_ivk_addr, next_ctx_addr, 
                     funcptr.mode, next_depth, load_codes.to_vec(), fnargv)?;
                 // save prev

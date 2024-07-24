@@ -1,6 +1,7 @@
 
 
 use crate::sys::*;
+use crate::x16rs::*;
 use crate::core::field::*;
 
 
@@ -11,6 +12,7 @@ include!("spcap.rs");
 include!("error.rs");
 include!("call.rs");
 include!("result.rs");
+include!("store.rs");
 
 
 

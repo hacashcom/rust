@@ -38,24 +38,17 @@ pub fn code_loader() -> Arc<Mutex<ContractLoader>> {
 }
 
 
-pub fn boot_vm<'a>(gas: i64,
+pub fn boot_vm<'a>(hei: u64, gas: i64,
     extn_caller: &'a mut dyn ExtActCaller,
     out_storage: &'a mut dyn OutStorager,
     out_storage_read: &'a mut dyn OutStoragerRead,
 ) -> Machine<'a> {
 
     let (a, b, c) = (extn_caller, out_storage, out_storage_read);
-    let mut resary = MACHINE_RESOURCES.lock().unwrap();
-    match resary.len() {
-
-        0 => machine::Machine::new(gas, 
-            a, b, c, code_loader()
-        ),
-
-        _ => machine::Machine::new_by_resouce(gas, 
-            a, b, c, resary.pop().unwrap()
-        ),
-
+    let reobj = MACHINE_RESOURCES.lock().unwrap().pop();
+    match reobj {
+        Some(r) => Machine::new_by_resouce(hei, gas, a, b, c, r),
+        _ => Machine::new(hei, gas, a, b, c, code_loader()),
     }
 }
 

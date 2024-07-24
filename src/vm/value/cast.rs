@@ -1,9 +1,13 @@
 
 
 macro_rules! do_cast_uint {
-    ($self: expr, $ty: ident, $f: ident) => {{
-        let n = $self.$f()?;
-        *$self = $ty(n);
+    ($self: expr, $u: expr) => {{
+        concat_idents!(fn_to_1 = to_u, $u {
+        let n = $self.fn_to_1()?;
+        });
+        concat_idents!(fn_ty_1 = U, $u {
+        *$self = fn_ty_1(n);
+        });
         Ok(())
     }}
 }
@@ -35,62 +39,24 @@ impl StackItem {
     /////////////////////////////////
 
     pub fn cast_u8(&mut self) -> VmrtErr {
-        do_cast_uint!(self, U8, to_uint8)
+        do_cast_uint!(self, 8)
     }
 
     pub fn cast_u16(&mut self) -> VmrtErr {
-        do_cast_uint!(self, U16, to_uint16)
+        do_cast_uint!(self, 16)
     }
 
     pub fn cast_u32(&mut self) -> VmrtErr {
-        do_cast_uint!(self, U32, to_uint32)
+        do_cast_uint!(self, 32)
     }
 
     pub fn cast_u64(&mut self) -> VmrtErr {
-        do_cast_uint!(self, U64, to_uint64)
+        do_cast_uint!(self, 64)
     }
 
     pub fn cast_u128(&mut self) -> VmrtErr {
-        do_cast_uint!(self, U128, to_uint128)
+        do_cast_uint!(self, 128)
     }
-
-    /*
-    pub fn cast_u16(&mut self) -> VmrtErr {
-        cast_low_to_up!{self, U8, u16, U16}
-        if let U16(_) = self { return Ok(()) }
-        cast_up_to_low!{self, u16, U16, u32, U32}
-        cast_up_to_low!{self, u16, U16, u64, U64}
-        cast_up_to_low!{self, u16, U16, u128, U128}
-        cannot_cast_err!(self, "U16") // error
-    }
-
-    pub fn cast_u32(&mut self) -> VmrtErr {
-        cast_low_to_up!{self, U8, u32, U32}
-        cast_low_to_up!{self, U16, u32, U32}
-        if let U32(_) = self { return Ok(()) }
-        cast_up_to_low!{self, u32, U32, u64, U64}
-        cast_up_to_low!{self, u32, U32, u128, U128}
-        cannot_cast_err!(self, "U32") // error
-    }
-
-    pub fn cast_u64(&mut self) -> VmrtErr {
-        cast_low_to_up!{self, U8, u64, U64}
-        cast_low_to_up!{self, U16, u64, U64}
-        cast_low_to_up!{self, U32, u64, U64}
-        if let U64(_) = self { return Ok(()) }
-        cast_up_to_low!{self, u64, U64, u128, U128}
-        cannot_cast_err!(self, "U64") // error
-    }
-
-    pub fn cast_u128(&mut self) -> VmrtErr {
-        cast_low_to_up!{self, U8, u128, U128}
-        cast_low_to_up!{self, U16, u128, U128}
-        cast_low_to_up!{self, U32, u128, U128}
-        cast_low_to_up!{self, U64, u128, U128}
-        if let U128(_) = self { return Ok(()) }
-        cannot_cast_err!(self, "U128") // ERROR
-    }
-    */
 
     pub fn cast_buf(&mut self) -> VmrtErr {
         match &self {

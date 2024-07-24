@@ -20,9 +20,20 @@ impl GasTable {
         ] { gtb[i as usize] = 3; }
         // 4
         for i in [
-            POW,
-            PUT /*locals put*/, 
+            POW, PUT, HREAD, HREADU, HREADUL
         ] { gtb[i as usize] = 4; }
+        // 8
+        for i in [
+            MGET, HWRITE, HWRITEX, HWRITEXL
+        ] { gtb[i as usize] = 8; }
+        // 16
+        for i in [
+            MPUT, GGET, 
+        ] { gtb[i as usize] = 16; }
+        // 32
+        for i in [
+            GPUT, 
+        ] { gtb[i as usize] = 32; }
         // ok
         GasTable(gtb)
     }

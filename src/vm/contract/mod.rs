@@ -5,6 +5,8 @@ use std::collections::{ HashMap, VecDeque };
 use std::collections::hash_map::Entry::Occupied;
 
 
+use crate::x16rs::*;
+
 use crate::sys::*;
 use crate::interface::field::*;
 use crate::interface::vm::*;

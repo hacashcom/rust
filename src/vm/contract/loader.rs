@@ -262,7 +262,7 @@ impl ContractLoader {
             return Ok(hav.into_mut())
         }
         // read or insert
-        let ctky = contract_store_key(addr);
+        let ctky = contract_code_content_store_key(addr);
         let value = match out_storage.get(&ctky).map_err(
             |e|ItrErr::new(OutStorageError, &format!("{}", &e))
         )? {

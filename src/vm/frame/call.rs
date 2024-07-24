@@ -7,13 +7,14 @@ use super::interpreter::*;
 
 macro_rules! do_execute_code {
     ($self: ident, $codes: expr, $pc: expr, ) => {
-        execute_code(
+        execute_code_of_call(
             $codes,
             $pc,
             $self.mode,
             $self.gas_limit,
             $self.gas_table,
             $self.gas_extra,
+            $self.space_cap,
             $self.extn_caller,
             $self.out_storage,
             $self.stack,
@@ -24,6 +25,7 @@ macro_rules! do_execute_code {
             $self.ctx_addr,
             $self.is_sys_call,
             $self.depth,
+            $self.pending_height,
         )
 
     }

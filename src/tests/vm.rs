@@ -31,7 +31,7 @@ pub fn main_vm_machine_call(codes: &str) {
     let mut extcaller = TestExtActCaller::new();
     let mut outstorer = TestOutStorager::new();
     let mut outstorerread = TestOutStorager::new();
-    let mut machine = vm::machine::Machine::new( gas,&mut extcaller, &mut outstorer, &mut outstorerread, vm::code_loader());
+    let mut machine = vm::machine::Machine::new( 5555, gas, &mut extcaller, &mut outstorer, &mut outstorerread, vm::code_loader());
 
     let adr1 = Address::min();
     println!("Address::min() = {}", &adr1.readable());
@@ -69,9 +69,9 @@ pub fn main_vm_frame_call_2834756283974() {
     let mut extcaller = vm::interpreter::TestExtActCaller::new();
     let mut outstorer = vm::interpreter::TestOutStorager::new();
     let res = frame.unwrap().exec(
-        &mut gas, &GasTable::new(), &GasExtra::new(), 
+        &mut gas, &GasTable::new(), &GasExtra::new(), &SpaceCap::new(), 
         &mut extcaller, &mut outstorer, 
-        &mut AddrKVMap::new(20), &mut KVMap::new(20), false,
+        &mut AddrKVMap::new(20), &mut KVMap::new(20), false, 55555
     ).call();
     println!("benchmark run time = {:?}", Instant::now().duration_since(now));
 
@@ -86,6 +86,7 @@ pub fn main_vm_execute_89234765982374() {
     let mut codes = hex::decode("bf034b42be01bd0159f002").unwrap();
     let gas_table = GasTable::new();
     let gas_extra = GasExtra::new();
+    let space_cap = SpaceCap::new();
 
     let gas_limit = 1576i64;
     let mut gas_usable = gas_limit;
@@ -102,10 +103,10 @@ pub fn main_vm_execute_89234765982374() {
         let mut pc: usize = 0;
         let mut extcaller = vm::interpreter::TestExtActCaller::new();
         let mut outstorer = vm::interpreter::TestOutStorager::new();
-        res = vm::interpreter::execute_code(&codes, &mut pc, &mode, 
-            &mut gas_usable, &gas_table, &gas_extra, &mut extcaller, &mut outstorer,
+        res = vm::interpreter::execute_code_of_call(&codes, &mut pc, &mode, 
+            &mut gas_usable, &gas_table, &gas_extra, &space_cap, &mut extcaller, &mut outstorer,
             &mut operand_stack, &mut locals, &mut Heap::new(64),
-            &mut AddrKVMap::new(20), &mut KVMap::new(20), &ctxadr, false, 0);
+            &mut AddrKVMap::new(20), &mut KVMap::new(20), &ctxadr, false, 0, 55555);
         lpnm -= 1;
         if lpnm <= 0 { break }
     }

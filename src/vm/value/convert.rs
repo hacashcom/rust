@@ -1,7 +1,7 @@
 
 
 
-fn buf_to_uint(buf: &[u8]) -> VmrtRes<StackItem> {
+pub fn buf_to_uint(buf: &[u8]) -> VmrtRes<StackItem> {
     let rlbts = buf_drop_left_zero(buf);
     let sizen = rlbts.len();
     match sizen {

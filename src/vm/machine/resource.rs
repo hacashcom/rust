@@ -43,7 +43,7 @@ impl Machine<'_> {
         }
     }
 
-    pub fn fetch_frame(&mut self) -> Frame {
+    pub fn alloc_frame(&mut self) -> Frame {
         match self.r.frame_pools.pop() {
             Some(f) => f,
             _ => Frame::default(),

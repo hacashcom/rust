@@ -4,7 +4,7 @@ const NORMAL_HASH_SIZE: usize = 32;
 
 // sha3
 fn sha3(v: &StackItem) -> VmrtRes<StackItem> {
-    let stuff = v.to_buf();
+    let stuff = v.to_buf()?;
     if stuff.len() == 0 {
         return itr_err_fmt!(NativeCall, "cannot do sha3 with empty bytes")
     }
@@ -18,7 +18,7 @@ fn sha3(v: &StackItem) -> VmrtRes<StackItem> {
 
 // sha2
 fn sha2(v: &StackItem) -> VmrtRes<StackItem> {
-    let stuff = v.to_buf();
+    let stuff = v.to_buf()?;
     if stuff.len() == 0 {
         return itr_err_fmt!(NativeCall, "cannot do sha2 with empty bytes")
     }
@@ -32,7 +32,7 @@ fn sha2(v: &StackItem) -> VmrtRes<StackItem> {
 
 // ripemd160
 fn ripemd160(v: &StackItem) -> VmrtRes<StackItem> {
-    let stuff = v.to_buf();
+    let stuff = v.to_buf()?;
     if stuff.len() == 0 {
         return itr_err_fmt!(NativeCall, "cannot do ripemd160 with empty bytes")
     }

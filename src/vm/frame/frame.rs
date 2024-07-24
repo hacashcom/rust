@@ -19,6 +19,7 @@ pub struct Frame {
 
 
 pub struct FrameExec<'a, 'b, 'c> {
+    pending_height: u64,
     is_sys_call: bool,
     depth: usize,
     //
@@ -34,6 +35,7 @@ pub struct FrameExec<'a, 'b, 'c> {
     pub gas_limit: &'b mut i64,
     gas_table: &'b GasTable,
     gas_extra: &'b GasExtra,
+    space_cap: &'b SpaceCap,
     extn_caller: &'c mut dyn ExtActCaller,
     out_storage: &'c mut dyn OutStorager,
     memory: &'c mut AddrKVMap,
@@ -128,13 +130,16 @@ impl Frame {
         gas_limit: &'b mut i64,
         gas_table: &'b GasTable,
         gas_extra: &'b GasExtra,
+        space_cap: &'b SpaceCap,
         extn_caller: &'c mut dyn ExtActCaller,
         out_storage: &'c mut dyn OutStorager,
         memory: &'c mut AddrKVMap,
         global: &'c mut KVMap,
         is_sys_call: bool,
+        pending_height: u64,
     ) -> FrameExec<'a, 'b, 'c> {
         FrameExec {
+            pending_height,
             is_sys_call,
             depth: self.depth,
             mode: &self.mode,
@@ -148,6 +153,7 @@ impl Frame {
             gas_limit,
             gas_table,
             gas_extra,
+            space_cap,
             extn_caller,
             out_storage,
             memory,

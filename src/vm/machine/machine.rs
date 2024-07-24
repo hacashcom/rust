@@ -11,6 +11,7 @@ pub struct Machine<'a> {
     contract_count: HashSet<ContractAddress>,
     */
     r: Resoure,
+    pending_height: u64,
     gas_limit: i64,
     // call_stacks: CallStack,
     extn_caller: &'a mut dyn ExtActCaller,
@@ -24,6 +25,7 @@ pub struct Machine<'a> {
 impl Machine<'_> {
 
     pub fn new_by_resouce<'a>(
+        pending_height: u64,
         gas_limit: i64, 
         extn_caller: &'a mut dyn ExtActCaller,
         out_storage: &'a mut dyn OutStorager,
@@ -32,6 +34,7 @@ impl Machine<'_> {
     ) -> Machine<'a> {;
         Machine {
             r,
+            pending_height,
             gas_limit,
             extn_caller,
             out_storage,
@@ -41,6 +44,7 @@ impl Machine<'_> {
 
 
     pub fn new<'a>(
+        pending_height: u64,
         gas_limit: i64, 
         extn_caller: &'a mut dyn ExtActCaller,
         out_storage: &'a mut dyn OutStorager,
@@ -65,6 +69,7 @@ impl Machine<'_> {
                 contract_count: HashSet::new(),
                 frame_pools: Vec::new(),
             },
+            pending_height,
             gas_limit,
             extn_caller,
             out_storage,
