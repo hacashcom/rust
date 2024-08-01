@@ -81,7 +81,7 @@ impl ExecContext for ExecEnvObj<'_> {
     fn vm(&mut self) -> Ret<&mut dyn VMIvk> {
         match self.vmobj {
             Some(..) => Ok(*self.vmobj.as_mut().unwrap()),
-            None => errf!("cannot create VM machine")
+            None => errf!("tx type or gas limit error: cannot create VM machine")
         }
     }
 

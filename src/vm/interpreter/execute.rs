@@ -214,6 +214,9 @@ pub fn execute_code_of_call(
     macro_rules! peeksetp2 { ($f: ident) => { 
         { let p1=pv!(); let p2=pv!(); pk!().$f(p2, p1)? } 
     } }
+    macro_rules! stowrap { () => { 
+        Storage::wrap(height, pv!(), ctx_addr, outstorager, space_cap)
+    } }
 
     // start run
     loop {
@@ -245,10 +248,6 @@ pub fn execute_code_of_call(
                 ops.push( resv );
             }
         }}
-
-        macro_rules! stowrap { () => { 
-            Storage::wrap(height, pv!(), ctx_addr, outstorager, space_cap)
-        } }
 
         match instruction {
             // ext action
