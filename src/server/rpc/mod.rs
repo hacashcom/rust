@@ -39,6 +39,7 @@ include!("routes.rs");
 include!("console.rs");
 
 include!("latest.rs");
+include!("supply.rs");
 include!("balance.rs");
 include!("diamond.rs");
 include!("block_intro.rs");

@@ -8,6 +8,7 @@ pub fn routes(mut ctx: ApiCtx) -> Router {
     
     // query
     .route(&query("latest"), get(latest))
+    .route(&query("supply"), get(supply))
     .route(&query("balance"), get(balance))
     .route(&query("diamond"), get(diamond))
     .route(&query("block_intro"), get(block_intro))

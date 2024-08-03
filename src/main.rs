@@ -49,9 +49,17 @@ sudo apt install cmake
 
 RUSTFLAGS="$RUSTFLAGS -Awarnings" RUST_BACKTRACE=1 cargo check / build / run
 mkdir -p ./target/debug/ && cp hacash.config.ini ./target/debug/ && RUSTFLAGS="$RUSTFLAGS -Awarnings" RUST_BACKTRACE=1 cargo run
+RUSTFLAGS="$RUSTFLAGS -Awarnings" RUST_BACKTRACE=1 cargo build --release && cp ./target/release/hacash ./hacash_release && ./hacash_release
 rm -rf ./target/debug/ && cargo clean
 
 */
+
+
+
+const HACASH_NODE_VERSION: &str = "0.1.0";
+const HACASH_NODE_BUILD_TIME: &str = "2024.8.1-1";
+const HACASH_STATE_DB_UPDT: u32 = 1;
+
 
 
 fn main() {
@@ -83,6 +91,15 @@ fn main() {
  * create and start hash node
  */
 fn start_hacash_node(iniobj: sys::IniObj) {
+
+    println!("[Version] full node v{}, build time: {}, database type: {}.", 
+        HACASH_NODE_VERSION, HACASH_NODE_BUILD_TIME, HACASH_STATE_DB_UPDT
+    );
+
+    use std::sync::mpsc::channel;
+    let (cltx, clrx) = channel();
+    ctrlc::set_handler(move || cltx.send(()).unwrap()); // ctrl+c to quit
+
     // println!("startHacashNode ini={:?}", iniobj);
     // mint
     crate::mint::action::init_reg();
@@ -90,7 +107,8 @@ fn start_hacash_node(iniobj: sys::IniObj) {
     let mint_checker = Box::new(BlockMintChecker::new(&iniobj));
 
     // engine
-    let engine = BlockEngine::open(&iniobj, mint_checker);
+    let dbv = HACASH_STATE_DB_UPDT;
+    let engine = BlockEngine::open(&iniobj, dbv, mint_checker);
     let engptr: Arc<BlockEngine> = Arc::new(engine);
 
     // node
@@ -104,24 +122,16 @@ fn start_hacash_node(iniobj: sys::IniObj) {
 
     // handle ctr+c to close
     let hn2 = hnode.clone();
-    ctrlc::set_handler( move || {
-        hn2.close();
-    });
+    std::thread::spawn(move||{ loop{
+        clrx.recv();
+        hn2.close(); // ctrl+c to quit
+    }});
 
     // start
     HacashNode::start(hnode);
 
     // on closed
     println!("\nHacash node closed.");
-
-
-    // test
-    // engine_test_3(engptr);
-
-
-    // run 10 year
-    // println!("main run 10 year");
-    // thread::sleep(std::time::Duration::from_secs(60*60*24*365*10));
 }
 
 

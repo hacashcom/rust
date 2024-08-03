@@ -37,17 +37,22 @@ pub struct BlockEngine {
 
 impl BlockEngine {
 
-    pub fn open(ini: &IniObj, mintk: Box<dyn MintChecker>) -> BlockEngine {
-        let cnf = EngineConf::new(ini);
-        // data dir
+    pub fn open(ini: &IniObj, dbv: u32, mintk: Box<dyn MintChecker>) -> BlockEngine {
+        let cnf = EngineConf::new(ini, dbv);
+        // load store
         std::fs::create_dir_all(&cnf.store_data_dir);
-        std::fs::create_dir_all(&cnf.state_data_dir);
-        // state & store
         let stoldb = BlockStore::open(&cnf.store_data_dir);
+        // if database upgrade
+        let is_database_upgrade = false == cnf.state_data_dir.exists();
+        // start state
+        std::fs::create_dir_all(&cnf.state_data_dir);
         let cstate = ChainState::open(&cnf.state_data_dir);
         let staptr = Arc::new(cstate);
         // base or genesis block
-        let bsblk = load_base_block(mintk.as_ref(), &stoldb);
+        let bsblk = match is_database_upgrade {
+            true => mintk.genesis_block().into(), // rebuild all block
+            false => load_base_block(mintk.as_ref(), &stoldb)
+        };            
         let roller = BlockRoller::create(bsblk, staptr);
         let stoptr = Arc::new(stoldb);
         // engine
@@ -59,7 +64,8 @@ impl BlockEngine {
             isrlck: Mutex::new(true),
         };
         // rebuild unstable blocks
-        engine.rebuild_unstable_blocks();
+        // if database upgrade, rebuild all block
+        engine.rebuild_unstable_blocks(); // 
         // ok finish
         engine
     }
